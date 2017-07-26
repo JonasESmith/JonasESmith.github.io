@@ -1,7 +1,320 @@
-<!DOCTYPE html>
-<html>
-<body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+
+<!-- Jonas Smith : Project Major --> 
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <title>The stages of a red superGiant </title>
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"> </script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+		    <style type='text/css'>
+        html { background-color: #333; }
+        @media only screen and (min-width: 800px){
+            .ui-page {
+                width: 1000px !important;
+                margin: 0 auto !important;
+                position: relative !important;
+                border-right: 5px #666 outset !important;
+                border-left:  5px #666 outset !important;
+            }
+        } </style>
+
+</head>
+<body >
+
+
+<div data-role="page" id="stage1">
+    <header data-role="header">
+        <h1 style="font-size: 120%;">The stages of a red supergiant Star</h1>
+        <div data-role="navbar">
+			<ul>
+				<li><a href="#stage1" data-icon="star" data-theme="b" class="ui-btn-active">Stage 1</a></li>
+				<li><a href="#stage2" data-icon="star" data-theme="b">Stage 2</a></li>
+				<li><a href="#stage3" data-icon="star" data-theme="b">Stage 3</a></li>
+				<li><a href="#stage4" data-icon="star" data-theme="b">Stage 4</a></li>
+				<li><a href="#stage5" data-icon="star" data-theme="b">Stage 5</a></li>
+			</ul>
+		</div>
+    </header>
+    <section class="ui-content" role="main">
+       	<h3 style="margin-left:7em;"> Stage 1</h3>
+    	<p style="margin-left:9em; margin-right:7em;">Most stars will go through many more than 5 main stages however whenever certain stars have a mass large enough the star is considered a supergiant and has a violnetly short life. Massive stars evolve in a similar way to a small stars until it reaches its main sequence stage. The stars shine steadily until the hydrogen has fused to form helium ( it takes billions of years in a small star, but only millions in a massive star).</p>    
+		<style>
+		* {box-sizing:border-box}
+		body {font-family: Verdana,sans-serif;margin:0}
+		.mySlides {display:none}
+
+		/* Slideshow container */
+		.slideshow-container {
+		  max-width: 600px;
+		  position: relative;
+		  margin: auto;
+		}
+
+		/* Next & previous buttons */
+		.prev, .next {
+		  cursor: pointer;
+		  position: absolute;
+		  top: 50%;
+		  width: auto;
+		  padding: 16px;
+		  margin-top: -22px;
+		  color: white;
+		  font-weight: bold;
+		  font-size: 18px;
+		  transition: 0.6s ease;
+		  border-radius: 0 3px 3px 0;
+		}
+
+		/* Position the "next button" to the right */
+		.next {
+		  right: 0;
+		  border-radius: 3px 0 0 3px;
+		}
+
+		/* On hover, add a black background color with a little bit see-through */
+		.prev:hover, .next:hover {
+		  background-color: rgba(0,0,0,0.8);
+		}
+
+		/* Caption text */
+		.text {
+		  color: #f2f2f2;
+		  font-size: 15px;
+		  padding: 8px 12px;
+		  position: absolute;
+		  bottom: 8px;
+		  width: 100%;
+		  text-align: center;
+		}
+
+		/* Number text (1/3 etc) */
+		.numbertext {
+		  color: #f2f2f2;
+		  font-size: 12px;
+		  padding: 8px 12px;
+		  position: absolute;
+		  top: 0;
+		}
+
+		/* The dots/bullets/indicators */
+		.dot {
+		  cursor:pointer;
+		  height: 13px;
+		  width: 13px;
+		  margin: 0 2px;
+		  background-color: #bbb;
+		  border-radius: 50%;
+		  display: inline-block;
+		  transition: background-color 0.6s ease;
+		}
+
+		.active, .dot:hover {
+		  background-color: #717171;
+		}
+
+		/* Fading animation */
+		.fade {
+		  -webkit-animation-name: fade;
+		  -webkit-animation-duration: 1.5s;
+		  animation-name: fade;
+		  animation-duration: 1.5s;
+		}
+
+		@-webkit-keyframes fade {
+		  from {opacity: .4} 
+		  to {opacity: 1}
+		}
+
+		@keyframes fade {
+		  from {opacity: .4} 
+		  to {opacity: 1}
+		}
+
+		/* On smaller screens, decrease text size */
+		@media only screen and (max-width: 300px) {
+		  .prev, .next,.text {font-size: 11px}
+		}
+		</style>
+		</head>
+		<body>
+
+		<div class="slideshow-container">
+
+		<div class="mySlides fade">
+		  <div class="numbertext">1 / 3</div>
+		  <img src="images/red-giant.jpg" style="width:100%">
+		  <div class="text">Comparison</div>
+		</div>
+
+		<div class="mySlides fade">
+		  <div class="numbertext">2 / 3</div>
+		  <img src="images/STAR_SIZE_SCALE.jpg" style="width:100%">
+		  <div class="text">Comparison</div>
+		</div>
+
+		<div class="mySlides fade">
+		  <div class="numbertext">3 / 3</div>
+		  <img src="images/determines.jpg" style="width:100%">
+		  <div class="text">Super Giant life Cycle</div>
+		</div>
+
+		<a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+		<a class="next" onclick="plusSlides(1)">&#10095;</a>
+
+		</div>
+		<br>
+
+		<div style="text-align:center">
+		  <span class="dot" onclick="currentSlide(1)"></span> 
+		  <span class="dot" onclick="currentSlide(2)"></span> 
+		  <span class="dot" onclick="currentSlide(3)"></span> 
+		</div>
+
+		<script>
+		var slideIndex = 1;
+		showSlides(slideIndex);
+
+		function plusSlides(n) {
+		  showSlides(slideIndex += n);
+		}
+
+		function currentSlide(n) {
+		  showSlides(slideIndex = n);
+		}
+
+		function showSlides(n) {
+		  var i;
+		  var slides = document.getElementsByClassName("mySlides");
+		  var dots = document.getElementsByClassName("dot");
+		  if (n > slides.length) {slideIndex = 1}    
+		  if (n < 1) {slideIndex = slides.length}
+		  for (i = 0; i < slides.length; i++) {
+			  slides[i].style.display = "none";  
+		  }
+		  for (i = 0; i < dots.length; i++) {
+			  dots[i].className = dots[i].className.replace(" active", "");
+		  }
+		  slides[slideIndex-1].style.display = "block";  
+		  dots[slideIndex-1].className += " active";
+		}
+		</script>
+				<p style="margin-left:8em; margin-right: 8em; text-align: center; "> Above is a comparison of the largest red giant ever seen by the kepler satelite and our sun. </p>
+
+    </section>
+    <footer data-role="footer">
+        <h4>&copy; Jonas Smith | Final Project</h4>
+    </footer>
+</div>
+
+
+<div data-role="page" id="stage2">
+    <header data-role="header">
+        <h1 style="font-size: 120%;">The stages of a red supergiant Star</h1>
+        <div data-role="navbar">
+		<ul>
+				<li><a href="#stage1" data-icon="star" data-theme="b">Stage 1</a></li>
+				<li><a href="#stage2" data-icon="star" data-theme="b"class="ui-btn-active">Stage 2</a></li>
+				<li><a href="#stage3" data-icon="star" data-theme="b">Stage 3</a></li>
+				<li><a href="#stage4" data-icon="star" data-theme="b">Stage 4</a></li>
+				<li><a href="#stage5" data-icon="star" data-theme="b">Stage 5</a></li>
+		</ul>
+	</div>
+    </header>
+      
+    <section class="ui-content" role="main">
+		<h3 style="margin-left:7em;"> Stage 2</h3>
+    	<p style="margin-left:7em; margin-right:7em;">The massive star then becomes a Red Supergiant and starts off with a helium core surrounded by a shell of cooling, expanding gas.</p>    
+        <center> <img src="images/super giant.jpg" width="500" height="500" alt="Red giant surrounded by gasses"> </center>
+
+        
+    </section>
+    <footer data-role="footer">
+        <h4>&copy; Jonas Smith | Final Project</h4>
+    </footer>
+</div>
+
+
+<div data-role="page" id="stage3">
+    <header data-role="header">
+        <h1 style="font-size: 120%;">The stages of a red supergiant Star</h1>
+        <div data-role="navbar">
+			<ul>
+				<li><a href="#stage1" data-icon="star" data-theme="b">Stage 1</a></li>
+				<li><a href="#stage2" data-icon="star" data-theme="b">Stage 2</a></li>
+				<li><a href="#stage3" data-icon="star" data-theme="b"class="ui-btn-active">Stage 3</a></li>
+				<li><a href="#stage4" data-icon="star" data-theme="b">Stage 4</a></li>
+				<li><a href="#stage5" data-icon="star" data-theme="b">Stage 5</a></li>
+			</ul>
+		</div>
+    </header>
+    <section class="ui-content" role="main">
+		<h3 style="margin-left:7em;"> Stage 3</h3>
+    	<p style="margin-left:7em; margin-right:7em;">In the next million years a series of nuclear reactions occur forming different elements in shells around the iron core. As these elements fuse the star expands until the star is mostly iron and cannot fuse any other elements.</p>   
+		<center> <img src="images/fusionPhases.JPG" width="499" height="431" alt="The different layers of a fusing star"> </center> 
+        <p style="margin-left:9em; margin-right: 7em; text-align: center;"> To get more information on the fusing elements of stars <a href="http://abyss.uoregon.edu/~js/ast122/lectures/lec18.html" > click here. </a> </p>
+
+	</section>
+    <footer data-role="footer">
+        <h4>&copy; Jonas Smith | Final Project</h4>
+    </footer>
+</div>
+
+
+<div data-role="page" id="stage4">
+    <header data-role="header">
+        <h1 style="font-size: 120%;">The stages of a red supergiant Star</h1>
+        <div data-role="navbar">
+			<ul>
+				<li><a href="#stage1" data-icon="star" data-theme="b">Stage 1</a></li>
+				<li><a href="#stage2" data-icon="star" data-theme="b">Stage 2</a></li>
+				<li><a href="#stage3" data-icon="star" data-theme="b">Stage 3</a></li>
+				<li><a href="#stage4" data-icon="star" data-theme="b"class="ui-btn-active">Stage 4</a></li>
+				<li><a href="#stage5" data-icon="star" data-theme="b">Stage 5</a></li>
+			</ul>
+		</div>
+    </header>
+    <section class="ui-content" role="main">
+		<h3 style="margin-left:7em;"> Stage 4</h3>
+    	<p style="margin-left:7em; margin-right:7em;">The core collapses in less than a second, causing an explosion called a Supernova, in which a shock wave blows off the outer layers of the star. (The actual supernova shines brighter than the entire galaxy for a short time). Learn more about supernova <a href="http://www.rochesterastronomy.org/snimages/"> here. </a></p>   
+		<center>
+		  <iframe width="640" height="480" src="https://www.youtube.com/embed/8en5uDqw0aM?loop=1" frameborder="0" allowfullscreen></iframe>
+		</center> 
+		<p style="margin-left:9em; margin-right: 8em; text-align: center;" > Occasionally the video does not loop correctly so you may need to hit the refresh button in the bottom left. </p>
+
+	
+	</section>
+    <footer data-role="footer">
+        <h4>&copy; Jonas Smith | Final Project</h4>
+    </footer>
+</div>
+
+
+<div data-role="page" id="stage5">
+    <header data-role="header">
+        <h1 style="font-size: 120%;">The stages of a red supergiant Star</h1>
+        <div data-role="navbar">
+			<ul>
+				<li><a href="#stage1" data-icon="star" data-theme="b">Stage 1</a></li>
+				<li><a href="#stage2" data-icon="star" data-theme="b">Stage 2</a></li>
+				<li><a href="#stage3" data-icon="star" data-theme="b">Stage 3</a></li>
+				<li><a href="#stage4" data-icon="star" data-theme="b">Stage 4</a></li>
+				<li><a href="#stage5" data-icon="star" data-theme="b"class="ui-btn-active">Stage 5</a></li>
+			</ul>
+		</div>
+    </header>
+    <section class="ui-content" role="main">
+		<h3 style="margin-left:7em;"> Stage 5</h3>
+    	<p style="margin-left:7em; margin-right:7em;">Sometimes the core survives the explosion. If the surviving core is between 1.5 - 3 solar masses it contracts to become a tiny, very dense Neutron Star. If the core is much greater than 3 solar masses, the core contracts to become a Black Hole. Bellow is a simulation of gravitational lensing that would occur if an observer was close enough to see a black hole. Learn more about black holes <a href="https://www.nasa.gov/audience/forstudents/k-4/stories/nasa-knows/what-is-a-black-hole-k4.html"> here. </a></p>   
+		<center> <img src="images/BlackHole_Lensing.gif" width="640" height="480" alt="A gif of a blackhole causing light to lense. "> </center> 
+		
+	</section>
+    <footer data-role="footer">
+        <h4>&copy; Jonas Smith | Final Project</h4>
+    </footer>
+</div>
 </body>
 </html>
