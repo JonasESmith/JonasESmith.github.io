@@ -1,2 +1,2 @@
 # JonasESmith.github.io
-Personal web-page 
+Simple webpage for my artwork, projects, and resume.
