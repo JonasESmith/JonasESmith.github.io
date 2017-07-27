@@ -2700,6 +2700,8 @@
 	header p {
 		position: relative;
 		margin: 0 0 1.5em 0;
+		text-outline: 2px;
+		outline-color: #000000;
 	}
 
 		@media screen and (max-width: 736px) {
@@ -2711,7 +2713,7 @@
 		}
 
 	header h2 + p {
-		font-size: 1.25em;
+		font-size: 1em;
 		margin-top: -0.5em;
 		line-height: 1.5em;
 	}
@@ -3646,8 +3648,8 @@
 		background-position: top left, center center;
 		background-attachment: fixed, fixed;
 		background-size: 100%, cover;
-		height:35vh;
-		min-height: 25em;
+		height:25vh;
+		min-height: 20em;
 	}
 
 		#header input[type="submit"],
