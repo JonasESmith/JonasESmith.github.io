@@ -2692,7 +2692,7 @@
 	}
 
 /* Section/Article */
-
+	
 	section.special, article.special {
 		text-align: center;
 	}
@@ -2793,18 +2793,19 @@
 			}
 
 		.spotlight:nth-child(2n) {
-			-moz-flex-direction: row-reverse;
-			-webkit-flex-direction: row-reverse;
-			-ms-flex-direction: row-reverse;
-			flex-direction: row-reverse;
+			-moz-flex-direction: row;
+			-webkit-flex-direction: row;
+			-ms-flex-direction: row;
+			flex-direction: row;
 		}
 
 			.spotlight:nth-child(2n) .image {
-				margin: 0 0 0 3em;
+				margin: 0 0 0 0em;
 			}
 
 			.spotlight:nth-child(2n) .content {
-				text-align: right;
+				margin: 0 0 0 3em;
+				width: 70%;
 			}
 
 	@media screen and (max-width: 736px) and (orientation: landscape) {
@@ -3851,6 +3852,7 @@
 		#header p {
 			font-size: 1.5em;
 			line-height: 1.35em;
+			text-align:right;
 		}
 
 			#header p br {
@@ -3867,7 +3869,7 @@
 			-ms-transform: translateX(0);
 			transform: translateX(0);
 			opacity: 1;
-			text-align: right;
+			text-align: left;
 			margin: -3.5em 4em 0 0;
 		}
 
