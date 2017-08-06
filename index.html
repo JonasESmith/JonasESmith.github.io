@@ -91,7 +91,7 @@
 								</section>
 							</div>
 							<ul class="actions">
-								<li><a href="https://github.com/JonasESmith" class="button" target="_blank">Go to my git-profile</a></li>
+								<li><a href="https://github.com/JonasESmith" class="button" target="_blank">my github profile</a></li>
 							</ul>
 						</div>
 					</section>
@@ -100,27 +100,32 @@
 					<section id="three" class="wrapper style1 fade-up">
 						<div class="inner">
 							<h2>Get in touch</h2>
-							<p>If you would like to contact me about anything please use the email address or the social media outlets below to do so. Or you can "leave a comment" that will give me your email address, name, and a short message.  </p>
+							<p>If you would like to contact me about anything please use the email address or the social media outlets below to do so.</p>
 							<div class="split style1">
 								<section>
-									<form method="post" action="#">
+								
+									<h3> About me </h3> 
+									<p> I am always learning and growing. I have been enjoying creating applications, and studying the math I will be using the machine learning. </p>
+									
+								<!--
+									<form method="post" action="">
 										<div class="field half first">
 											<label for="name">Name</label>
-											<input type="text" name="name" id="name" />
+											<input type="text" name="name"/>
 										</div>
 										<div class="field half">
 											<label for="email">Email</label>
-											<input type="text" name="email" id="email" />
+											<input type="text" name="email"/>
 										</div>
 										<div class="field">
 											<label for="message">Message</label>
 											<textarea name="message" id="message" rows="5"></textarea>
 										</div>
 										<ul class="actions">
-											<li><a class="button submit">This currently does not work</a></li>
+											<li> <input type="submit" class="submit"></li>
 										</ul>
-									</form>
-								</section>
+									</form> This can be used later when I learn more about php -->
+								</section>  
 								<section>
 									<ul class="contact">
 										<li>
@@ -155,6 +160,25 @@
 			<script src="assets/js/main.js"></script>
 	</body>
 </html>
+
+<?php 
+if(isset($_POST['submit'])){
+    $to = "pictofoster@gmail"; // this is your Email address
+    $from = $_POST['email']; // this is the sender's Email address
+    $first_name = $_POST['name'];
+    $subject = "Form submission";
+    $subject2 = "Copy of your form submission";
+    $message = name . " " " wrote the following:" . "\n\n" . $_POST['message'];
+    $message2 = "Here is a copy of your message " . $first_name . "\n\n" . $_POST['message'];
+
+    $headers = "From:" . $from;
+    $headers2 = "From:" . $to;
+    mail($to,$subject,$message,$headers);
+    mail($from,$subject2,$message2,$headers2); // sends a copy of the message to the sender
+    echo "Mail Sent. Thank you " . $first_name . ", we will contact you shortly.";
+    // You can also use header('Location: thank_you.php'); to redirect to another page.
+    }
+?> 
 <!--
 	Hyperspace by HTML5 UP 
     Edited by: Jonas Smith 
