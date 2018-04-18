@@ -1781,7 +1781,7 @@
 	}
 
 	pre {
-		-webkit-overflow-scrolling: touch;
+		-webkit-overflow-scrolling: hidden;
 		font-family: "Courier New", monospace;
 		font-size: 0.9em;
 		margin: 0 0 2rem 0;
@@ -2728,7 +2728,7 @@
 /* Table */
 
 	.table-wrapper {
-		-webkit-overflow-scrolling: touch;
+		-webkit-overflow-scrolling: hidden;
 		margin: 0 0 2rem 0;
 		overflow-x: hidden;
 	}
