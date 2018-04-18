@@ -1611,6 +1611,7 @@
 	}
 
 	body {
+		overflow-x: hidden;
 		-ms-overflow-style: hidden;
 	}
 
