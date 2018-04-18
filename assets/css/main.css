@@ -1642,7 +1642,6 @@
 
 	html {
 		font-size: 18pt;
-		overflow-y: hidden;
 	}
 
 		@media screen and (max-width: 1680px) {
