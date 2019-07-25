@@ -203,10 +203,13 @@ canvas{
   padding-top: 20%;
 }
 
+.link {
+  border-bottom: 1px dotted rgb(204, 204, 204);
+}
+
 .tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black;
   text-decoration: none;
   border: none
 }
