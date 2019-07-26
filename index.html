@@ -28,7 +28,7 @@
         <h3 id="about" class="inner_info_header"> About me, </h3>
         <p id="about" class="about_para"> &nbsp; &nbsp; &nbsp; &nbsp;
           I am currently working for PinnacleHemp as their lead Software
-          Engineer, I enjoy programming in C#, python, java, C++, javascript,
+          Engineer. I enjoy programming in C#, python, java, C++, javascript,
           and html / css. I am currently attending Missouri Southern State University
           for Computational Mathematics, I will be graduating in spring of 2020! 😄
         </p>
@@ -69,25 +69,25 @@
           <div class="link_div tooltip">
             <span class="tooltiptext">GitHub Profile</span>
             <a id="linkClick" target="_blank" href="https://github.com/JonasESmith">
-              <img src="images/githubWhite.png" style="width: 50%; height: 70%;">
+              <img src="images/githubWhiteX200.png" style="width: 50%; height: 70%;">
             </a>
           </div>
           <div class="link_div tooltip">
             <span class="tooltiptext">LinkedIn Profile</span>
             <a id="linkClick" target="_blank" href="https://www.linkedin.com/in/jonas-smith-006716176/">
-              <img src="images/linkedInWhite.png" style="padding-top: 4px; width: 40%; height: 70%;">
+              <img src="images/linkedInWhiteX200.png" style=" width: 50%; height: 70%;">
             </a>
           </div>
           <div class="link_div tooltip">
             <span class="tooltiptext">My art page!</span>
             <a id="linkClick" href="Art.html" target="_blank">
-              <img src="images/artBrushWhite.png" style=" width: 50%; height: 70%;">
+              <img src="images/artBrushWhiteX200.png" style=" width: 50%; height: 60%;">
             </a>
           </div>
           <div class="link_div tooltip">
             <span class="tooltiptext">Resume</span>
             <a id="linkClick" href="jonas_smith.pdf" target="_blank">
-              <img src="images/resumeWhite.png" style=" width: 35%; height: 60%;">
+              <img src="images/resumeWhiteX200.png" style=" width: 45%; height: 60%;">
             </a>
           </div>
         </div>
@@ -97,13 +97,13 @@
 
   <!-- scripts -->
   <script src="particles.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/app.js">   </script>
 
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script>
     $(document).ready(function () {
       var boolValue = true;
-
+      
       $("#linkClick").click(
         function () {
           boolValue = true;
@@ -124,6 +124,9 @@
       $("#div1").hover(
         //on mouseover
         function () {
+          var widthVal = $( window ).width();
+          var padding_left = ((widthVal - '60em') / 2);
+
           if (boolValue) {
             $(this).find('#content').stop(false, false).animate({
                 opacity: '1'
@@ -148,7 +151,7 @@
                   top: '25%',
                   opacity: 0.95,
                 }, 'slow', //sets animation speed to slow
-              );
+              ).center();
           }
         },
         //on mouseout
