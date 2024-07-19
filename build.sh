@@ -31,8 +31,8 @@ loading_animation & dart run build_runner build --delete-conflicting-outputs ; k
 echo "Build completed successfully!"
 
 # Build the Flutter web application
-# flutter build web  --release 
-flutter build web --web-renderer html --release 
+flutter build web  --release 
+# flutter build web --web-renderer html --release 
 
 # Remove the <base href="/"> line from index.html
 sed -i '' '/<base href="\/"/d' build/web/index.html

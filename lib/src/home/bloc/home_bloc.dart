@@ -87,7 +87,7 @@ class HomeBloc extends HydratedBloc<HomeEvent, HomeState> {
       skills: [
         Skill(
           startMsse: DateTime(2018, 2).millisecondsSinceEpoch.toString(),
-          url: "images/images/flutter_logo.png",
+          url: "assets/images/images/flutter_logo.png",
           name: "Flutter",
           content: """
 Flutter is an amazing front-end framework that now supports pretty much all platforms. It allows for development across a wide range of devices: mobile (iOS and Android), desktop (Linux, Windows, and macOS), wearables (Apple Watch and other smart watches), and even embedded systems. This versatility has empowered me to create responsive and adaptable applications ( Examples :  [This website!](/project/portfolio), [RCG](rock-climber-guide), [Better Fantasy System](/project/better-fantasy-system), [Eqalink](/project/eqalink) , essentially turning me into four developers in one.
@@ -136,7 +136,7 @@ Working with Dart and Flutter has been a pleasure, especially when it comes to d
         ),
         Skill(
           name: "Rust",
-          url: "images/rust.png",
+          url: "assets/images/rust.png",
           startMsse: DateTime(2023, 5).millisecondsSinceEpoch.toString(),
           content: """
 Rust has made me feel much more powerful as a developer. It has allowed me to take complex ideas and develop them into reality with relative ease. My best example of this is my [Better Fantasy System](/project/better-fantasy-system).
@@ -184,7 +184,7 @@ All of this stemmed from a simple idea of a custom crafting system. Because of h
         Skill(
           startMsse: DateTime(2017, 1).millisecondsSinceEpoch.toString(),
           name: "UI/UX Design",
-          url: "images/design.png",
+          url: "assets/images/design.png",
           content: """
 I have always enjoyed creating software that is intuitive, beautiful, and empowering for its users. My journey in software development began with Javascript, HTML, and CSS. From there, I expanded my skills to include C#, Flutter, and various other frameworks and technologies. My most recent exploration has been with Rust.
 
@@ -197,7 +197,7 @@ Ultimately, I've found myself moving towards Flutter. It feels the most empoweri
         Skill(
           name: "Python",
           startMsse: DateTime(2018, 5).millisecondsSinceEpoch.toString(),
-          url: "images/python.png",
+          url: "assets/images/python.png",
           content: """
 Python is such a fun language, it allows for quick iteration, and is often my starting point for getting an mvp off of the gorund before I move into a more efficient language. Python is often where I start or where I go for more experimental projects, however in production I have used this often for automation scripts, reporting, fraud detection, and web scraping with [pakmo](/project/pakmo). 
 """,
@@ -239,7 +239,7 @@ Python is such a fun language, it allows for quick iteration, and is often my st
           startMsse: DateTime(2014, 1).millisecondsSinceEpoch.toString(),
           endMsse: DateTime(2019, 1).millisecondsSinceEpoch.toString(),
           name: ".Net",
-          url: "images/net.png",
+          url: "assets/images/net.png",
           content:
               "Worked with C# building out applicaitons for things as simple as mileage calculation forms, to building out personal assitances applications that use voice to text, Research Projects like Nurikabe, and navigating the users applicaitons.",
           experience: Experience.EXPERIENCED,
@@ -265,7 +265,7 @@ Python is such a fun language, it allows for quick iteration, and is often my st
         Skill(
           startMsse: DateTime(2012, 1).millisecondsSinceEpoch.toString(),
           name: "Pencil Drawing",
-          url: "images/pencil.png",
+          url: "assets/images/pencil.png",
           content:
               "I have been drawing since I was a kid, but as an adult it helps me visualize projects, and gives me an amazing creative outlet. I love drawing portraits, and have gotten into curvi-linear perspective drawings. This is often where my beginning ideas start, simple sketchs on paper, and I will refine from there going into more and more detail until I move into software, or into reality with my wood working!",
           experience: Experience.EXPERIENCED,
@@ -273,7 +273,7 @@ Python is such a fun language, it allows for quick iteration, and is often my st
         Skill(
           startMsse: DateTime(2020, 1).millisecondsSinceEpoch.toString(),
           name: "Wood Working",
-          url: "images/chisel.png",
+          url: "assets/images/chisel.png",
           content:
               "Started making rock climbing holds for my climbing wall at home, and from this simple start begin creating furniture, and from here began making cabnentry, and many other wood working style skills.",
           experience: Experience.EXPERIENCED,
@@ -298,7 +298,7 @@ I'm always eager to learn new technologies and take on exciting challenges that 
 """,
         name: "Jonas E. Smith",
         email: "pictofoster@gmail.com",
-        imagePath: "images/profile.jpeg",
+        imagePath: "assets/images/profile.jpeg",
         links: [
           "https://github.com/JonasESmith",
           "https://www.instagram.com/jonas.e.smith/",
@@ -319,35 +319,35 @@ I'm always eager to learn new technologies and take on exciting challenges that 
           imgUrls: [
             const ImageUrl(
               thumbNail: "",
-              url: "images/eqalink/01.png",
+              url: "assets/images/eqalink/01.png",
             ),
             const ImageUrl(
               thumbNail: "",
-              url: "images/eqalink/02.png",
+              url: "assets/images/eqalink/02.png",
             ),
             const ImageUrl(
               thumbNail: "",
-              url: "images/eqalink/03.png",
+              url: "assets/images/eqalink/03.png",
             ),
             const ImageUrl(
               thumbNail: "",
-              url: "images/eqalink/04.png",
+              url: "assets/images/eqalink/04.png",
             ),
             const ImageUrl(
               thumbNail: "",
-              url: "images/eqalink/05.png",
+              url: "assets/images/eqalink/05.png",
             ),
             const ImageUrl(
               thumbNail: "",
-              url: "images/eqalink/06.png",
+              url: "assets/images/eqalink/06.png",
             ),
             const ImageUrl(
               thumbNail: "",
-              url: "images/eqalink/07.jpeg",
+              url: "assets/images/eqalink/07.jpeg",
             ),
             const ImageUrl(
               thumbNail: "",
-              url: "images/eqalink/08.jpeg",
+              url: "assets/images/eqalink/08.jpeg",
             ),
           ],
           completionType: CompletionType.ACTIVE,
@@ -416,7 +416,7 @@ Eqalink is a social media startup that prioritizes user control and security fro
           endMsse: -1,
           lessons: [],
           description: "Secuirty First Social Media Platform",
-          iconAssetPath: "images/eqalink_logo.png",
+          iconAssetPath: "assets/images/eqalink_logo.png",
           startMsse: DateTime(
             2023,
             6,
@@ -499,7 +499,7 @@ once this is built and run we are up to date!
           url: "www.jonasesmith.com",
           lessons: [],
           description: "A looking glass into my projects, work, and love for building",
-          iconAssetPath: "images/dagger.png",
+          iconAssetPath: "assets/images/dagger.png",
           startMsse: DateTime(
             2023,
             6,
@@ -612,19 +612,19 @@ pub enum ClimbTechnique {
           endMsse: -1,
           lessons: [],
           imgUrls: const [
-            ImageUrl(thumbNail: "", url: "images/rcg/sessions_running_light.png"),
-            ImageUrl(thumbNail: "", url: "images/rcg/sessions_page.png"),
-            ImageUrl(thumbNail: "", url: "images/rcg/session_running.png"),
-            ImageUrl(thumbNail: "", url: "images/rcg/log_climb.png"),
-            ImageUrl(thumbNail: "", url: "images/rcg/repeater_setup.png"),
-            ImageUrl(thumbNail: "", url: "images/rcg/tabata_running.png"),
-            ImageUrl(thumbNail: "", url: "images/rcg/records_page.png"),
-            ImageUrl(thumbNail: "", url: "images/rcg/new_exercise.png"),
-            ImageUrl(thumbNail: "", url: "images/rcg/workouts.png"),
-            ImageUrl(thumbNail: "", url: "images/rcg/app_mac.png"),
+            ImageUrl(thumbNail: "", url: "assets/images/rcg/sessions_running_light.png"),
+            ImageUrl(thumbNail: "", url: "assets/images/rcg/sessions_page.png"),
+            ImageUrl(thumbNail: "", url: "assets/images/rcg/session_running.png"),
+            ImageUrl(thumbNail: "", url: "assets/images/rcg/log_climb.png"),
+            ImageUrl(thumbNail: "", url: "assets/images/rcg/repeater_setup.png"),
+            ImageUrl(thumbNail: "", url: "assets/images/rcg/tabata_running.png"),
+            ImageUrl(thumbNail: "", url: "assets/images/rcg/records_page.png"),
+            ImageUrl(thumbNail: "", url: "assets/images/rcg/new_exercise.png"),
+            ImageUrl(thumbNail: "", url: "assets/images/rcg/workouts.png"),
+            ImageUrl(thumbNail: "", url: "assets/images/rcg/app_mac.png"),
           ],
           description: "Climbers bible",
-          iconAssetPath: "images/rcg.png",
+          iconAssetPath: "assets/images/rcg.png",
           startMsse: DateTime(
             2023,
             6,
@@ -681,7 +681,7 @@ The backend is written in rust, using Actix, diesel, and postgres, as well as a 
           endMsse: -1,
           lessons: [],
           description: "A highly customizable table top simulator for players and GMs",
-          iconAssetPath: "images/dagger.png",
+          iconAssetPath: "assets/images/dagger.png",
           startMsse: DateTime(
             2023,
             6,
@@ -689,19 +689,19 @@ The backend is written in rust, using Actix, diesel, and postgres, as well as a 
           imgUrls: const [
             ImageUrl(
               thumbNail: "",
-              url: 'images/bfs/bfs_player.png',
+              url: 'assets/images/bfs/bfs_player.png',
             ),
             ImageUrl(
               thumbNail: "",
-              url: 'images/bfs/bfs_items.png',
+              url: 'assets/images/bfs/bfs_items.png',
             ),
             ImageUrl(
               thumbNail: "",
-              url: 'images/bfs/bfs_item_page.png',
+              url: 'assets/images/bfs/bfs_item_page.png',
             ),
             ImageUrl(
               thumbNail: "",
-              url: 'images/bfs/bfs_notes_page.png',
+              url: 'assets/images/bfs/bfs_notes_page.png',
             ),
           ],
           technologies: [
@@ -725,11 +725,11 @@ The backend is written in rust, using Actix, diesel, and postgres, as well as a 
           imgUrls: const [
             ImageUrl(
               thumbNail: "",
-              url: 'images/pakmo/01.jpeg',
+              url: 'assets/images/pakmo/01.jpeg',
             ),
             ImageUrl(
               thumbNail: "",
-              url: 'images/pakmo/02.png',
+              url: 'assets/images/pakmo/02.png',
             ),
           ],
           completionType: CompletionType.INNACTIVE,
@@ -756,7 +756,7 @@ Built out scripts to look through orders and client user information to find fra
           endMsse: -1,
           lessons: [],
           description: "Shipment, order, customer tracker",
-          iconAssetPath: "images/box.png",
+          iconAssetPath: "assets/images/box.png",
           startMsse: DateTime(
             2023,
             6,
