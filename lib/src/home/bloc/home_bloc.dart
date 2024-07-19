@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -40,9 +41,9 @@ class HomeBloc extends HydratedBloc<HomeEvent, HomeState> {
     _Started event,
     Emitter<HomeState> emit,
   ) {
-    if (Modular.to.path == "/") {
-      ProjectsPage.route();
-    }
+    // if (Modular.to.path == "/") {
+    //   ProjectsPage.route();
+    // }
 
     var model = state.whenOrNull(
           loaded: (AppData model) => model,
@@ -76,6 +77,12 @@ class HomeBloc extends HydratedBloc<HomeEvent, HomeState> {
 
   AppData initAppState() {
     log("WE ARE INSTANITLIZING OUR THING");
+
+    // var path = "/images";
+
+    // if (!kDebugMode) {
+    //   path = "projects/assets/images";
+    // }
 
     return AppData(
       isAboutMeOpen: false,
