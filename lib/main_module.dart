@@ -42,6 +42,7 @@ class MainModule extends Module {
         ModuleRoute(SettingsPage.routeName, module: SettingsModule()),
         ModuleRoute(ProjectsPage.routeName, module: ProjectsModule()),
         ModuleRoute(ExperiencePage.routeName, module: ExperienceModule()),
+        WildcardRoute(child: (_) => const ProjectsPage())
       ],
       transition: TransitionType.noTransition,
     );
