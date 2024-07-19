@@ -62,9 +62,9 @@ flutter:
 
   assets:
     # Add assets from the images directory to the application.
-    - assets/eqalink/
-    - assets/rcg/
-    - assets/pakmo/
-    - assets/images/
-    - assets/bfs/
-    - assets/
+    - images/eqalink/
+    - images/rcg/
+    - images/pakmo/
+    - images/images/
+    - images/bfs/
+    - images/
