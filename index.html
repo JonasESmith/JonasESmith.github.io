@@ -1,258 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<!--
-  Programmer : Jonas Smith
-  Purpose    : A (hopefully) cool looking website to show some of the things I like to work on!
-  Resources  : Particle affect by VincentGarreau - https://github.com/VincentGarreau/particles.js
--->
+<html>
 
 <head>
-  <meta charset="utf-8">
-  <title>Jonas Smith</title>
-  <meta name="description" content="Development Website for JONAS SMITH">
-  <meta name="author" content="JONAS SMITH" />
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" media="screen" href="css/style.css">
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="portfolio">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <title>portfolio</title>
+  <link rel="manifest" href="manifest.json">
+  <!-- 
+    We are adding this to attempt to remove the ability for users
+   to hit Cmd+p and print screen... 
+   -->
+  <script src="prevent_default.js"></script>
 </head>
 
 <body>
-
-  <!-- particles.js container -->
-  <div id="particles-js">
-    <div id="div1" class="infoDiv">
-      <h1 id="name" class="name">JONAS SMITH</h1>
-      <h3 id="name_title" class="position_name">Software Engineer</h3>
-      <div id="content" class="inner_info_div">
-        <h3 id="about" class="inner_info_header"> About me, </h3>
-        <p id="about" class="about_para"> &nbsp; &nbsp; &nbsp; &nbsp;
-          I am currently working for <a href="https://www.pinnacle.design/" >Pinnacle.design </a> as their lead Software
-          Engineer. I enjoy programming in Dart, Java, C#, python, C++, javascript,
-          and html / css. I graduated from Missouri Southern State University with 
-          a double major in computational Mathematics! 😄
-        </p>
-        <div class="columns_section">
-          <div class="column left">
-            <h3 class="inner_info_header" style="padding-left: 0%"> Noteworthy Projects </h3>
-            <ul style="padding-top: 2%">
-              <li class="li_item"> <a style="color: white" target="_blank" class="link"
-                  href="https://github.com/JonasESmith/Pinnacle_E-Commerce"> Pinnacle E-Commerce </a> </li>
-              <li class="li_item"> <a style="color: white" target="_blank" class="link"
-                  href="https://github.com/JonasESmith/SpotifyAlarm"> Spotify-Alarm </a></li>
-              <li class="li_item"> <a style="color: white" target="_blank" class="link"
-                  href="https://github.com/JonasESmith/LaunchBoi"> LaunchBoi </a>
-              <li class="li_item "> <a style="color: white" target="_blank" class="link"
-                  href="https://github.com/JonasESmith/NURIKABE"> Nurikabe </a></li>
-              <li class="li_item "> <a style="color: white" target="_blank" class="link"
-                  href="https://github.com/JonasESmith/DNA"> DNA</a>
-            </ul>
-            </ul>
-          </div>
-          <div class="column right">
-            <h3 class="inner_info_header" style="padding-left: 0%"> Interests </h3>
-            <ul style="padding-top: 2%">
-              <li class="li_item">Desktop App Development</li>
-              <li class="li_item">iOS / Android Development</li>
-              <li class="li_item">Full Stack Development</li>
-              <li class="li_item">Clean UI's</li>
-            </ul>
-
-
-          </div>
-
-        </div>
-        <div class="link_bar">
-          <div class="link_div_padding_left">
-
-          </div>
-          <div class="link_div tooltip">
-            <span class="tooltiptext">GitHub Profile</span>
-            <a id="linkClick" target="_blank" href="https://github.com/JonasESmith">
-              <img src="images/githubWhiteX200.png" style="width: 50%; height: 70%;">
-            </a>
-          </div>
-          <div class="link_div tooltip">
-            <span class="tooltiptext">LinkedIn Profile</span>
-            <a id="linkClick" target="_blank" href="https://www.linkedin.com/in/jonas-smith-006716176/">
-              <img src="images/linkedInWhiteX200.png" style=" width: 50%; height: 70%;">
-            </a>
-          </div>
-          <div class="link_div tooltip">
-            <span class="tooltiptext">My art page!</span>
-            <a id="linkClick" href="Art.html" target="_blank">
-              <img src="images/artBrushWhiteX200.png" style=" width: 50%; height: 60%;">
-            </a>
-          </div>
-          <div class="link_div tooltip">
-            <span class="tooltiptext">Resume</span>
-            <a id="linkClick" href="jonas_smith.pdf" target="_blank">
-              <img src="images/resumeWhiteX200.png" style=" width: 45%; height: 60%;">
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- scripts -->
-  <script src="particles.js"></script>
-  <script src="js/app.js">   </script>
-
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="flutter_bootstrap.js" async></script>
   <script>
-    $(document).ready(function () {
-      var boolValue = true;
-      
-      $("#linkClick").click(
-        function () {
-          boolValue = true;
-        }
-        // boolValue = false,
-      );
-
-      $("#div1").click(
-        function () {
-          if (boolValue)
-            boolValue = false;
-          else
-            boolValue = true;
-        }
-        // boolValue = false,
-      );
-
-      $("#div1").hover(
-        //on mouseover
-        function () {
-          var widthVal = $( window ).width();
-          var padding_left = ((widthVal - '60em') / 2);
-
-          if (boolValue) {
-            $(this).find('#content').stop(false, false).animate({
-                opacity: '1'
-              }, 'slow'),
-              $(this).find('#about').stop(false, false).animate({
-                'padding-top': '3%',
-                opacity: '1'
-              }, 'slow'),
-              $(this).find('#name').stop(false, false).animate({
-                opacity: '1',
-                'font-size': '35px',
-                'padding-top': '2%'
-              }, 'slow'),
-              $(this).find('#name_title').stop(false, false).animate({
-                opacity: '0',
-                'padding-top': '0%'
-              }, 'slow'),
-              $(this).stop(false, false).animate({
-                  height: '48em', //substracts 250px
-                  width: '60em',
-                  left: '39.25%',
-                  top: '25%',
-                  opacity: 0.95,
-                }, 'slow', //sets animation speed to slow
-              ).center();
-          }
-        },
-        //on mouseout
-        function () {
-          if (boolValue) {
-            $(this).find('#content').stop(false, false).animate({
-                opacity: '0'
-              }, 'fast'),
-              $(this).find('#about').stop(false, false).animate({
-                'padding-top': '0%',
-                opacity: '0'
-              }, 'fast'),
-              $(this).find('#name').stop(false, false).animate({
-                opacity: '1',
-                'font-size': '40px',
-                'padding-top': '16%'
-              }, 'slow'),
-              $(this).find('#name_title').stop(false, false).animate({
-                opacity: '1',
-                'padding-top': '5%'
-              }, 'slow'),
-              $(this).stop(false, false).animate({
-                  height: '18em', //substracts 250px
-                  width: '30em',
-                  opacity: 0.6,
-                  left: '50%',
-                  top: '50%',
-                }, 'slow', //sets animation speed to slo
-              );
-          }
-        }
-      );
-
-    });
-  </script>
-  <script>
-    var $el = $('div');
-
-    var p_x, p_y,
-      window_width = window.innerWidth,
-      window_height = window.innerHeight;
-
-    var m = {
-      moving_left: false,
-      moving_up: false,
-      last_x: 0,
-      last_y: 0,
-      x: 0,
-      y: 0
-    };
-
-    var colors = {
-      orange: {
-        r: 238,
-        g: 119,
-        b: 0
-      },
-      blue: {
-        r: 40,
-        g: 203,
-        b: 215
-      }
-    };
-
-    $el.on('mousemove', function (e) {
-      m.x = e.pageX;
-      m.y = e.pageY;
-
-      m.moving_left = (m.x < m.last_x) ? true : false;
-      m.moving_up = (m.y < m.last_y) ? true : false;
-
-      m.last_x = m.x;
-      m.last_y = m.y;
-
-      var percentage = m.y / window_width;
-      var col = 'rgb(' + getRed(percentage) + ',' + getGreen(percentage) + ',' + getBlue(percentage) + ')';
-
-      $el.css('background-color', col);
-
-    });
-
-    function getRed(percentage) {
-      var max = 33,
-        min = 17;
-      var range = max - min;
-      return min + Math.floor(range * percentage);
-    }
-
-    function getGreen(percentage) {
-      var max = 24,
-        min = 17;
-      var range = max - min;
-      return min + Math.floor(range * percentage);
-    }
-
-    function getBlue(percentage) {
-      var max = 69,
-        min = 69;
-      var range = max - min;
-      return min + Math.floor(range * percentage);
-    }
+    preventDefault();
   </script>
 </body>
 
