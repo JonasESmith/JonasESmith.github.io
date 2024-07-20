@@ -1,6 +1,6 @@
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
-import 'package:flutter_modular/flutter_modular.dart' hide ModularWatchExtension;
 import 'package:portfolio/src/core/widgets/page_wrapper.dart';
+import 'package:portfolio/src/projects/projects.dart';
 import 'package:provider/provider.dart';
 
 import '../core/core.dart';
@@ -10,10 +10,7 @@ class MyHomePage extends StatefulWidget {
   /// Creates a const [MyHomePage].
   const MyHomePage({
     super.key,
-    required this.data,
   });
-
-  final AppData data;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -42,35 +39,13 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   void initState() {
-    showFollower = widget.data.showMouseFollower;
-    followerOpacity = widget.data.mouseFollowerOpacity;
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<AppData>(context);
-    final size = MediaQuery.of(context).size;
 
-    return VoxMouseFollower(
-      colorOpacity: model.mouseFollowerOpacity,
-      enabled: model.showMouseFollower,
-      child: PageSettingsWrapper(
-        child: Row(
-          children: [
-            Expanded(
-              child: PageWrapper(
-                child: VoxResponsiveBuilder(
-                  width: size.width,
-                  key: const PageStorageKey("Howdy_partner"),
-                  child: const RouterOutlet(),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    return const ProjectsPage();
   }
 }

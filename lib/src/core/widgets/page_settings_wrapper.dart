@@ -70,6 +70,7 @@ class _PageSettingsWrapperState extends State<PageSettingsWrapper> {
     log("Is search open : ${appData.isSearchOpen}");
 
     return KeyboardListener(
+      key: const Key("CUNT_FUCKING_DICK_HEAD_SETTINGS_PAGE"),
       focusNode: _focusNode,
       autofocus: true,
       onKeyEvent: (event) {

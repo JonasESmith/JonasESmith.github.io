@@ -26,8 +26,9 @@ class ProjectListTile extends StatelessWidget {
     return OurListTileItem(
       onPressed: () {
         ProjectPage.route(
-          project: project,
           data: appData,
+          project: project,
+          context: context,
         );
       },
       child: Column(

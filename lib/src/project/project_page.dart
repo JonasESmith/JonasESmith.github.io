@@ -1,12 +1,14 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:go_router/go_router.dart';
 import 'package:portfolio/src/core/core.dart';
 import 'package:portfolio/src/core/utils/utils.dart';
+import 'package:portfolio/src/core/widgets/page_wrapper.dart';
 import 'package:portfolio/src/home/bloc/home_bloc.dart';
 import 'package:portfolio/src/projects/projects.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// [ProjectPage] the display page for this feature
@@ -25,8 +27,9 @@ class ProjectPage extends StatefulWidget {
   /// our route, this should generally use the modular route, and
   /// our basic route callable item
   static void route({
-    required Project project,
     required AppData data,
+    required Project project,
+    required BuildContext context,
   }) {
     /// lets create our custom title
     final title = UrlUtil.cleanUrlTitle(title: project.title);
@@ -48,9 +51,15 @@ class ProjectPage extends StatefulWidget {
       );
     }
 
-    Modular.to.pushNamed(
-      "$routeName/$title",
+    context.go(
+      Uri(
+        path: '/project/$title',
+      ).toString(),
     );
+
+    // Modular.to.pushNamed(
+    //   "$routeName/$title",
+    // );
   }
 
   @override
@@ -174,11 +183,12 @@ class _ProjectPageState extends State<ProjectPage> with SingleTickerProviderStat
                                       child: const Icon(CupertinoIcons.chevron_back),
                                     ),
                                     onPressed: () {
-                                      if (Navigator.of(context).canPop()) {
-                                        Navigator.of(context).pop();
-                                      } else {
-                                        ProjectsPage.route();
-                                      }
+                                      // if (Navigator.of(context).canPop()) {
+                                      context.go("/");
+                                      // } else {
+                                      //   // ProjectsPage.route();
+
+                                      // }
                                     },
                                   ),
                                   VoxButton(

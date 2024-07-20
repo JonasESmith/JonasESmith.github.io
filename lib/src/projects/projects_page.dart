@@ -12,7 +12,7 @@ import 'package:portfolio/src/home/bloc/home_bloc.dart';
 import 'package:provider/provider.dart';
 
 /// [ProjectsPage] the display page for this feature
-class ProjectsPage extends StatelessWidget {
+class ProjectsPage extends StatefulWidget {
   /// [ProjectsPage] constructor.
   const ProjectsPage({super.key});
 
@@ -30,10 +30,60 @@ class ProjectsPage extends StatelessWidget {
   }
 
   @override
+  State<ProjectsPage> createState() => _ProjectsPageState();
+}
+
+class _ProjectsPageState extends State<ProjectsPage> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _profileAnimation;
+  late Animation<double> _projectsAnimation;
+  late Animation<double> _skillsAnimation;
+  final scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    _profileAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
+
+    _projectsAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.3, 0.8, curve: Curves.easeOut),
+      ),
+    );
+
+    _skillsAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.6, 1.0, curve: Curves.easeOut),
+      ),
+    );
+
+    Future.delayed(const Duration(milliseconds: 600), () {
+      _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final appData = Provider.of<AppData>(context);
     final projects = appData.projects;
-    final scrollController = ScrollController();
     final theme = Theme.of(context);
 
     final userAgeMSSE = DateTime.now().millisecondsSinceEpoch - //
@@ -76,101 +126,110 @@ class ProjectsPage extends StatelessWidget {
                       const SizedBox(
                         height: kPad * 10,
                       ),
-                      Center(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(
-                            sigmaY: 10,
-                            sigmaX: 10,
-                          ),
-                          child: VoxButton(
-                            onPressed: () {
-                              Modular.get<HomeBloc>().add(
-                                HomeEvent.updateModel(
-                                  data: appData.copyWith(
-                                    isAboutMeOpen: !appData.isAboutMeOpen,
+                      FadeTransition(
+                        opacity: _profileAnimation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0, -0.2),
+                            end: Offset.zero,
+                          ).animate(_profileAnimation),
+                          child: Center(
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(
+                                sigmaY: 10,
+                                sigmaX: 10,
+                              ),
+                              child: VoxButton(
+                                onPressed: () {
+                                  Modular.get<HomeBloc>().add(
+                                    HomeEvent.updateModel(
+                                      data: appData.copyWith(
+                                        isAboutMeOpen: !appData.isAboutMeOpen,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(kPad / 2),
+                                    color: theme.colorScheme.primary.withOpacity(0.05),
+                                    border: Border.all(
+                                      color: theme.colorScheme.primary.withOpacity(0.1),
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(kPad / 2),
-                                color: theme.colorScheme.primary.withOpacity(0.05),
-                                border: Border.all(
-                                  color: theme.colorScheme.primary.withOpacity(0.1),
-                                ),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: kPad / 2,
-                                vertical: kPad / 4,
-                              ),
-                              child: Column(
-                                children: [
-                                  Row(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: kPad / 2,
+                                    vertical: kPad / 4,
+                                  ),
+                                  child: Column(
                                     children: [
-                                      Expanded(
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 40,
-                                              height: 40,
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(kPad * 3),
-                                                child: Image.asset(
-                                                  key: Key(appData.profile.imagePath),
-                                                  fit: BoxFit.cover,
-                                                  appData.profile.imagePath,
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 40,
+                                                  height: 40,
+                                                  child: ClipRRect(
+                                                    borderRadius: BorderRadius.circular(kPad * 3),
+                                                    child: Image.asset(
+                                                      key: Key(appData.profile.imagePath),
+                                                      fit: BoxFit.cover,
+                                                      appData.profile.imagePath,
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
+                                                const HPad.half(),
+                                                Text(
+                                                  "JONAS.E.SMITH",
+                                                  style: theme.textTheme.bodyLarge!.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            const HPad.half(),
-                                            Text(
-                                              "JONAS.E.SMITH",
-                                              style: theme.textTheme.bodyLarge!.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                          ),
+                                          Text(
+                                            finalVersion,
+                                            style: theme.textTheme.bodyLarge!.copyWith(
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                          const HPad.half(),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: theme.dividerColor,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            height: kPad * 2,
+                                            width: kPad * 2,
+                                            padding: const EdgeInsets.all(kPad / 8),
+                                            child: Icon(
+                                              !appData.isAboutMeOpen //
+                                                  ? CupertinoIcons.chevron_down
+                                                  : CupertinoIcons.chevron_up,
+                                              color: theme.disabledColor,
+                                              size: kPad,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        finalVersion,
-                                        style: theme.textTheme.bodyLarge!.copyWith(
-                                          fontWeight: FontWeight.bold,
+                                      if (appData.isAboutMeOpen) ...{
+                                        const Divider(),
+                                        AnimatedSwitcher(
+                                          duration: const Duration(milliseconds: 300),
+                                          child: appData.isAboutMeOpen
+                                              ? VoxMarkdown(
+                                                  key: UniqueKey(),
+                                                  content: appData.profile.description,
+                                                )
+                                              : SizedBox(key: UniqueKey()),
                                         ),
-                                      ),
-                                      const HPad.half(),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: theme.dividerColor,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        height: kPad * 2,
-                                        width: kPad * 2,
-                                        padding: const EdgeInsets.all(kPad / 8),
-                                        child: Icon(
-                                          !appData.isAboutMeOpen //
-                                              ? CupertinoIcons.chevron_down
-                                              : CupertinoIcons.chevron_up,
-                                          color: theme.disabledColor,
-                                          size: kPad,
-                                        ),
-                                      ),
+                                      },
                                     ],
                                   ),
-                                  if (appData.isAboutMeOpen) ...{
-                                    const Divider(),
-                                    AnimatedSwitcher(
-                                      duration: const Duration(milliseconds: 300),
-                                      child: appData.isAboutMeOpen
-                                          ? VoxMarkdown(
-                                              key: UniqueKey(),
-                                              content: appData.profile.description,
-                                            )
-                                          : SizedBox(key: UniqueKey()),
-                                    ),
-                                  },
-                                ],
+                                ),
                               ),
                             ),
                           ),
@@ -182,150 +241,176 @@ class ProjectsPage extends StatelessWidget {
                       //   style: theme.textTheme.bodySmall,
                       // ),
                       const VPad(),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: kPad / 4),
-                            child: Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Noteable Projects",
-                                      style: theme.textTheme.bodySmall,
+                      FadeTransition(
+                        opacity: _projectsAnimation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0, 0.2),
+                            end: Offset.zero,
+                          ).animate(_projectsAnimation),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: kPad / 4),
+                                    child: Row(
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Noteable Projects",
+                                              style: theme.textTheme.bodySmall,
+                                            ),
+                                            const VPad.half(),
+                                          ],
+                                        ),
+                                      ],
                                     ),
-                                    const VPad.half(),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const HPad(),
-                          const Expanded(child: Divider()),
-                          const HPad.half(),
-                          Icon(
-                            CupertinoIcons.keyboard_chevron_compact_down,
-                            color: theme.disabledColor,
-                            size: kPad,
-                          ),
-                        ],
-                      ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        controller: scrollController,
-                        itemCount: projects.length,
-                        itemBuilder: (context, index) {
-                          final project = projects[index];
-
-                          final hasVisited = appData.visited!.indexWhere(
-                                (e) => e == project.title,
-                              ) !=
-                              -1;
-
-                          return LinkStyleButton(
-                            label: project.title,
-                            hasBeenClicked: hasVisited,
-                            leading: Container(
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                color: hasVisited //
-                                    // ? theme.colorScheme.primary
-                                    // : theme.colorScheme.tertiary,
-                                    ? CupertinoColors.systemPurple
-                                    : CupertinoColors.activeBlue,
-                                borderRadius: BorderRadius.circular(kPad / 4),
+                                  ),
+                                  const HPad(),
+                                  const Expanded(child: Divider()),
+                                  const HPad.half(),
+                                  Icon(
+                                    CupertinoIcons.keyboard_chevron_compact_down,
+                                    color: theme.disabledColor,
+                                    size: kPad,
+                                  ),
+                                ],
                               ),
-                              padding: const EdgeInsets.all(kPad / 8),
-                              // child: Image.asset(
-                              //   project.iconAssetPath,
-                              //   fit: BoxFit.contain,
-                              // ),
-                              child: ImageIconColored(
-                                url: project.iconAssetPath,
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                controller: scrollController,
+                                itemCount: projects.length,
+                                itemBuilder: (context, index) {
+                                  final project = projects[index];
+
+                                  final hasVisited = appData.visited!.indexWhere(
+                                        (e) => e == project.title,
+                                      ) !=
+                                      -1;
+
+                                  return LinkStyleButton(
+                                    label: project.title,
+                                    hasBeenClicked: hasVisited,
+                                    leading: Container(
+                                      width: 20,
+                                      height: 20,
+                                      decoration: BoxDecoration(
+                                        color: hasVisited //
+                                            // ? theme.colorScheme.primary
+                                            // : theme.colorScheme.tertiary,
+                                            ? CupertinoColors.systemPurple
+                                            : CupertinoColors.activeBlue,
+                                        borderRadius: BorderRadius.circular(kPad / 4),
+                                      ),
+                                      padding: const EdgeInsets.all(kPad / 8),
+                                      // child: Image.asset(
+                                      //   project.iconAssetPath,
+                                      //   fit: BoxFit.contain,
+                                      // ),
+                                      child: ImageIconColored(
+                                        url: project.iconAssetPath,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      ProjectPage.route(
+                                        data: appData,
+                                        context: context,
+                                        project: project,
+                                      );
+                                    },
+                                    date: DateTime.fromMillisecondsSinceEpoch(
+                                      project.startMsse,
+                                    ),
+                                  );
+                                },
                               ),
-                            ),
-                            onPressed: () {
-                              ProjectPage.route(
-                                project: project,
-                                data: appData,
-                              );
-                            },
-                            date: DateTime.fromMillisecondsSinceEpoch(
-                              project.startMsse,
-                            ),
-                          );
-                        },
+                            ],
+                          ),
+                        ),
                       ),
                       const VPad(),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: kPad / 4),
-                            child: Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Skills",
-                                      style: theme.textTheme.bodySmall,
+                      FadeTransition(
+                        opacity: _skillsAnimation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0, 0.2),
+                            end: Offset.zero,
+                          ).animate(_skillsAnimation),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: kPad / 4),
+                                    child: Row(
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Skills",
+                                              style: theme.textTheme.bodySmall,
+                                            ),
+                                            const VPad.half(),
+                                          ],
+                                        ),
+                                      ],
                                     ),
-                                    const VPad.half(),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  ),
+                                  const HPad(),
+                                  const Expanded(child: Divider()),
+                                  const HPad.half(),
+                                  Icon(
+                                    CupertinoIcons.chart_bar_alt_fill,
+                                    color: theme.disabledColor,
+                                    size: kPad,
+                                  ),
+                                ],
+                              ),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                controller: scrollController,
+                                itemCount: appData.skills.length,
+                                itemBuilder: (context, index) {
+                                  final skill = appData.skills[index];
+
+                                  var skill_start = calculateYearsOfExperience(
+                                    skill.startMsse.toString(),
+                                  );
+
+                                  if (skill.endMsse != null) {
+                                    skill_start = calculateDuration(
+                                      skill.startMsse!,
+                                      skill.endMsse!,
+                                    );
+                                  }
+
+                                  return LinkStyleButton(
+                                    label: skill.name,
+                                    hasBeenClicked: false,
+                                    leading: Row(
+                                      children: [
+                                        const HPad.half(),
+                                        Text(
+                                          "$skill_start y",
+                                          style: theme.textTheme.bodySmall,
+                                        ),
+                                        const HPad.half(),
+                                      ],
+                                    ),
+                                    onPressed: () {},
+                                    date: DateTime.now(),
+                                  );
+                                },
+                              ),
+                            ],
                           ),
-                          const HPad(),
-                          const Expanded(child: Divider()),
-                          const HPad.half(),
-                          Icon(
-                            CupertinoIcons.chart_bar_alt_fill,
-                            color: theme.disabledColor,
-                            size: kPad,
-                          ),
-                        ],
-                      ),
-
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        controller: scrollController,
-                        itemCount: appData.skills.length,
-                        itemBuilder: (context, index) {
-                          final skill = appData.skills[index];
-
-                          var skill_start = calculateYearsOfExperience(
-                            skill.startMsse.toString(),
-                          );
-
-                          if (skill.endMsse != null) {
-                            skill_start = calculateDuration(
-                              skill.startMsse!,
-                              skill.endMsse!,
-                            );
-                          }
-
-                          return LinkStyleButton(
-                            label: skill.name,
-                            hasBeenClicked: false,
-                            leading: Row(
-                              children: [
-                                const HPad.half(),
-                                Text(
-                                  "$skill_start y",
-                                  style: theme.textTheme.bodySmall,
-                                ),
-                                const HPad.half(),
-                              ],
-                            ),
-                            onPressed: () {},
-                            date: DateTime.now(),
-                          );
-                        },
+                        ),
                       ),
                       const SizedBox(
                         height: kPad * 10,

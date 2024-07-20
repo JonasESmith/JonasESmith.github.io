@@ -55,8 +55,9 @@ class VoxMarkdown extends StatelessWidget {
                     .where((e) => e.title.toLowerCase() == pName.toLowerCase())
                     .first;
                 ProjectPage.route(
-                  project: project,
                   data: appData,
+                  project: project,
+                  context: context,
                 );
                 return;
               }

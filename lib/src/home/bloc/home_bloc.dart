@@ -41,9 +41,9 @@ class HomeBloc extends HydratedBloc<HomeEvent, HomeState> {
     _Started event,
     Emitter<HomeState> emit,
   ) {
-    if (Modular.to.path == "/") {
-      ProjectsPage.route();
-    }
+    // if (Modular.to.path == "/") {
+    //   ProjectsPage.route();
+    // }
 
     var model = state.whenOrNull(
           loaded: (AppData model) => model,
@@ -78,7 +78,7 @@ class HomeBloc extends HydratedBloc<HomeEvent, HomeState> {
   AppData initAppState() {
     log("WE ARE INSTANITLIZING OUR THING");
 
-    var path = "assets";
+    var path = "images";
 
     if (!kDebugMode) {
       path = "images";

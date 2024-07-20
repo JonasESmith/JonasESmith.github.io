@@ -30,7 +30,7 @@ class MainModule extends Module {
             uninitialized: () => const SizedBox(),
             loaded: (data) => Provider.value(
               value: data,
-              child: MyHomePage(data: data),
+              child: const MyHomePage(),
             ),
           );
         },
@@ -42,9 +42,23 @@ class MainModule extends Module {
         ModuleRoute(SettingsPage.routeName, module: SettingsModule()),
         ModuleRoute(ProjectsPage.routeName, module: ProjectsModule()),
         ModuleRoute(ExperiencePage.routeName, module: ExperienceModule()),
-        WildcardRoute(child: (_) => const ProjectsPage())
+        // WildcardRoute(child: (_) => const ProjectsPage())
       ],
       transition: TransitionType.noTransition,
+    );
+    r.wildcard(
+      child: (_) => BlocBuilder<HomeBloc, HomeState>(
+        bloc: Modular.get<HomeBloc>(),
+        builder: (context, state) {
+          return state.when(
+            uninitialized: () => const SizedBox(),
+            loaded: (data) => Provider.value(
+              value: data,
+              child: MyHomePage(),
+            ),
+          );
+        },
+      ),
     );
   }
 }
