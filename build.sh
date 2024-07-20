@@ -46,7 +46,7 @@ mkdir -p ../../projects/assets
 find . -maxdepth 1 ! -name 'assets' ! -name '.' -exec cp -R {} ../../ \;
 
 # Copy assets/ into the projects/assets/ folder at root
-cp -R assets ../../projects/
+cp -R assets ../../assets/projects/
 
 # Navigate back to the root directory
 cd ../..
