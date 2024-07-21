@@ -1,11 +1,75 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="portfolio">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <title>portfolio</title>
+  <link rel="manifest" href="manifest.json">
+  <!-- 
+    We are adding this to attempt to remove the ability for users
+   to hit Cmd+p and print screen... 
+   -->
+  <script src="prevent_default.js"></script>
+
   <script>
     sessionStorage.redirect = location.href;
   </script>
   <meta http-equiv="refresh" content="0;URL='/'">
 </head>
+
 <body>
+
+  <script>
+    (function () {
+      var redirect = sessionStorage.redirect;
+      delete sessionStorage.redirect;
+      if (redirect && redirect != location.href) {
+        history.replaceState(null, null, redirect);
+      }
+    })();
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+  <script>
+    preventDefault();
+  </script>
+
+  <script>
+    (function () {
+      // Retrieve the URL the user was trying to access
+      var redirect = sessionStorage.redirect;
+      delete sessionStorage.redirect;
+      // If this is a redirection coming from a 404, replace the URL and reload
+      if (redirect && redirect != location.href) {
+        history.replaceState(null, null, redirect);
+      }
+    })();
+  </script>
 </body>
+
 </html>
