@@ -68,4 +68,10 @@ flutter:
     - images/pakmo/
     - images/images/
     - images/bfs/
+    - images/compressed/eqalink/
+    - images/compressed/rcg/
+    - images/compressed/pakmo/
+    - images/compressed/images/
+    - images/compressed/bfs/
+    - images/compressed/
     - images/

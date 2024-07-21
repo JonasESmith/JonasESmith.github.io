@@ -2,11 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:portfolio/src/core/core.dart';
-import 'package:portfolio/src/projects/projects.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -54,11 +52,7 @@ class HomeBloc extends HydratedBloc<HomeEvent, HomeState> {
       model = initAppState();
     }
 
-    return emit(
-      HomeState.loaded(
-        data: model,
-      ),
-    );
+    return emit(HomeState.loaded(data: model));
   }
 
   @override
@@ -81,7 +75,7 @@ class HomeBloc extends HydratedBloc<HomeEvent, HomeState> {
     var path = "images";
 
     if (!kDebugMode) {
-      path = "images";
+      path = "images/compressed";
     }
 
     return AppData(
@@ -326,35 +320,35 @@ I'm always eager to learn new technologies and take on exciting challenges that 
           imgUrls: [
             ImageUrl(
               thumbNail: "",
-              url: "$path/eqalink/01.png",
+              url: "$path/compressed/eqalink/01.jpeg",
             ),
             ImageUrl(
               thumbNail: "",
-              url: "$path/eqalink/02.png",
+              url: "$path/compressed/eqalink/02.jpeg",
             ),
             ImageUrl(
               thumbNail: "",
-              url: "$path/eqalink/03.png",
+              url: "$path/compressed/eqalink/03.jpeg",
             ),
             ImageUrl(
               thumbNail: "",
-              url: "$path/eqalink/04.png",
+              url: "$path/compressed/eqalink/04.jpeg",
             ),
             ImageUrl(
               thumbNail: "",
-              url: "$path/eqalink/05.png",
+              url: "$path/compressed/eqalink/05.jpeg",
             ),
             ImageUrl(
               thumbNail: "",
-              url: "$path/eqalink/06.png",
+              url: "$path/compressed/eqalink/06.jpeg",
             ),
             ImageUrl(
               thumbNail: "",
-              url: "$path/eqalink/07.jpeg",
+              url: "$path/compressed/eqalink/07.jpeg",
             ),
             ImageUrl(
               thumbNail: "",
-              url: "$path/eqalink/08.jpeg",
+              url: "$path/compressed/eqalink/08.jpeg",
             ),
           ],
           completionType: CompletionType.ACTIVE,
@@ -501,6 +495,31 @@ echo "Build completed successfully!"
 ```
 
 once this is built and run we are up to date!
+
+
+> As an added fun feature we used a rust image compression script to go through iterate over folders and convert images to .jpeg formats of different sizes this is the output 
+
+``` 
+Processing directory: ../images/rcg with format: Jpeg, ratio: 0.279
+
+File                               Original   Compressed  Reduction
+------------------------------ ------------ ------------ ----------
+app_mac.png                          209.32        20.36      90.3%
+records_page.png                     601.56        33.68      94.4%
+session_running.png                  218.68        32.69      85.1%
+tabata_running.png                   145.58        15.76      89.2%
+new_exercise.png                     224.95        34.55      84.6%
+sessions_page.png                    400.13        34.09      91.5%
+sessions_running_light.png           400.94        34.23      91.5%
+workouts.png                         214.28        27.65      87.1%
+log_climb.png                        209.77        24.50      88.3%
+repeater_setup.png                   219.63        28.07      87.2%
+
+------------------------------------------------------------------
+Total space saved: 2.50 MB (90.0% reduction)
+Original size: 2.78 MB, Compressed size: 0.28 MB
+```
+
 """,
           endMsse: -1,
           url: "www.jonasesmith.com",
@@ -619,16 +638,16 @@ pub enum ClimbTechnique {
           endMsse: -1,
           lessons: [],
           imgUrls: [
-            ImageUrl(thumbNail: "", url: "$path/rcg/sessions_running_light.png"),
-            ImageUrl(thumbNail: "", url: "$path/rcg/sessions_page.png"),
-            ImageUrl(thumbNail: "", url: "$path/rcg/session_running.png"),
-            ImageUrl(thumbNail: "", url: "$path/rcg/log_climb.png"),
-            ImageUrl(thumbNail: "", url: "$path/rcg/repeater_setup.png"),
-            ImageUrl(thumbNail: "", url: "$path/rcg/tabata_running.png"),
-            ImageUrl(thumbNail: "", url: "$path/rcg/records_page.png"),
-            ImageUrl(thumbNail: "", url: "$path/rcg/new_exercise.png"),
-            ImageUrl(thumbNail: "", url: "$path/rcg/workouts.png"),
-            ImageUrl(thumbNail: "", url: "$path/rcg/app_mac.png"),
+            ImageUrl(thumbNail: "", url: "$path/compressed/rcg/sessions_running_light.jpeg"),
+            ImageUrl(thumbNail: "", url: "$path/compressed/rcg/sessions_page.jpeg"),
+            ImageUrl(thumbNail: "", url: "$path/compressed/rcg/session_running.jpeg"),
+            ImageUrl(thumbNail: "", url: "$path/compressed/rcg/log_climb.jpeg"),
+            ImageUrl(thumbNail: "", url: "$path/compressed/rcg/repeater_setup.jpeg"),
+            ImageUrl(thumbNail: "", url: "$path/compressed/rcg/tabata_running.jpeg"),
+            ImageUrl(thumbNail: "", url: "$path/compressed/rcg/records_page.jpeg"),
+            ImageUrl(thumbNail: "", url: "$path/compressed/rcg/new_exercise.jpeg"),
+            ImageUrl(thumbNail: "", url: "$path/compressed/rcg/workouts.jpeg"),
+            ImageUrl(thumbNail: "", url: "$path/compressed/rcg/app_mac.jpeg"),
           ],
           description: "Climbers bible",
           iconAssetPath: "$path/rcg.png",
@@ -694,22 +713,10 @@ The backend is written in rust, using Actix, diesel, and postgres, as well as a 
             6,
           ).millisecondsSinceEpoch,
           imgUrls: [
-            ImageUrl(
-              thumbNail: "",
-              url: '$path/bfs/bfs_player.png',
-            ),
-            ImageUrl(
-              thumbNail: "",
-              url: '$path/bfs/bfs_items.png',
-            ),
-            ImageUrl(
-              thumbNail: "",
-              url: '$path/bfs/bfs_item_page.png',
-            ),
-            ImageUrl(
-              thumbNail: "",
-              url: '$path/bfs/bfs_notes_page.png',
-            ),
+            ImageUrl(thumbNail: "", url: '$path/compressed/bfs/bfs_player.jpeg'),
+            ImageUrl(thumbNail: "", url: '$path/compressed/bfs/bfs_items.jpeg'),
+            ImageUrl(thumbNail: "", url: '$path/compressed/bfs/bfs_item_page.jpeg'),
+            ImageUrl(thumbNail: "", url: '$path/compressed/bfs/bfs_notes_page.jpeg'),
           ],
           technologies: [
             const Technology(label: "Flutter", url: "https://flutter.dev/"),
@@ -730,14 +737,8 @@ The backend is written in rust, using Actix, diesel, and postgres, as well as a 
           ],
           url: "https://pakmo-e7476.web.app/",
           imgUrls: [
-            ImageUrl(
-              thumbNail: "",
-              url: '$path/pakmo/01.jpeg',
-            ),
-            ImageUrl(
-              thumbNail: "",
-              url: '$path/pakmo/02.png',
-            ),
+            ImageUrl(thumbNail: "", url: '$path/compressed/pakmo/01.jpeg'),
+            ImageUrl(thumbNail: "", url: '$path/compressed/pakmo/02.jpeg'),
           ],
           completionType: CompletionType.INNACTIVE,
           platforms: const [

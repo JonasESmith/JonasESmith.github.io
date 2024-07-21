@@ -126,7 +126,8 @@ class PageFooter extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        Modular.get<HomeBloc>().add(const HomeEvent.reset());
+                        Modular.get<HomeBloc>() //
+                            .add(const HomeEvent.reset());
                       },
                       label: "Reset",
                       trailing: const Icon(
