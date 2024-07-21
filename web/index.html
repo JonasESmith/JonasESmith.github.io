@@ -44,6 +44,18 @@
   <script>
     preventDefault();
   </script>
+
+  <script>
+    (function () {
+      // Retrieve the URL the user was trying to access
+      var redirect = sessionStorage.redirect;
+      delete sessionStorage.redirect;
+      // If this is a redirection coming from a 404, replace the URL and reload
+      if (redirect && redirect != location.href) {
+        history.replaceState(null, null, redirect);
+      }
+    })();
+  </script>
 </body>
 
 </html>
