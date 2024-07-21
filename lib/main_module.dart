@@ -46,19 +46,5 @@ class MainModule extends Module {
       ],
       transition: TransitionType.noTransition,
     );
-    r.wildcard(
-      child: (_) => BlocBuilder<HomeBloc, HomeState>(
-        bloc: Modular.get<HomeBloc>(),
-        builder: (context, state) {
-          return state.when(
-            uninitialized: () => const SizedBox(),
-            loaded: (data) => Provider.value(
-              value: data,
-              child: MyHomePage(),
-            ),
-          );
-        },
-      ),
-    );
   }
 }

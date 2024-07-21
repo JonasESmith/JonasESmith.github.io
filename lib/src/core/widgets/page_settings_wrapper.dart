@@ -244,12 +244,15 @@ class _SearchWidgetState extends State<SearchWidget> {
                 decoration: BoxDecoration(
                   color: theme.scaffoldBackgroundColor,
                   borderRadius: BorderRadius.circular(
-                    kPad / 4,
+                    kPad / 1.2,
+                  ),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withOpacity(0.5),
                   ),
                   boxShadow: [
                     BoxShadow(
                       blurRadius: 8,
-                      color: theme.shadowColor.withOpacity(0.1),
+                      color: theme.shadowColor.withOpacity(0.2),
                       offset: const Offset(0, 4),
                     ),
                   ],

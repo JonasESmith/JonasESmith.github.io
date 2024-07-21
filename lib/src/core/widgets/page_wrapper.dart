@@ -15,7 +15,7 @@ class PageWrapper extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Material(
-      color: theme.colorScheme.primary.withOpacity(0.05),
+      color: Colors.transparent,
       child: Column(
         children: [
           Expanded(
