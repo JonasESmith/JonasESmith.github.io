@@ -36,19 +36,58 @@ flutter build web --release
 # Remove the <base href="/"> line from index.html
 sed -i '' '/<base href="\/"/d' build/web/index.html
 
+# Add the redirection script to index.html
+sed -i '' '/<body>/r'<(cat << EOF
+
+<script>
+  (function() {
+    var redirect = sessionStorage.redirect;
+    delete sessionStorage.redirect;
+    if (redirect && redirect != location.href) {
+      history.replaceState(null, null, redirect);
+    }
+  })();
+</script>
+EOF
+) build/web/index.html
+
+# Create 404.html file
+cat > build/web/404.html << EOF
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    sessionStorage.redirect = location.href;
+  </script>
+  <meta http-equiv="refresh" content="0;URL='/'">
+</head>
+<body>
+</body>
+</html>
+EOF
+
 # Navigate to the build/web directory
 cd build/web
 
-# Create the projects/assets directory in the root
-mkdir -p ../../projects/assets
+# Create the assets directory in the root if it doesn't exist
+mkdir -p ../../assets
 
 # Copy all files and folders except assets/ to the root directory
 find . -maxdepth 1 ! -name 'assets' ! -name '.' -exec cp -R {} ../../ \;
 
-# Copy assets/ into the projects/assets/ folder at root
-cp -R assets ../../assets/projects/
+# Copy assets/ into the assets/ folder at root
+cp -R assets/* ../../assets/
 
 # Navigate back to the root directory
 cd ../..
 
-echo "Build complete. Files have been copied to the root directory and assets to projects/assets/."
+# Move assets/projects/assets into assets/
+if [ -d "assets/projects/assets" ]; then
+  mv assets/projects/assets/* assets/
+  rm -rf assets/projects/assets
+  echo "Moved assets/projects/assets into assets/"
+else
+  echo "Warning: assets/projects/assets directory not found"
+fi
+
+echo "Build complete. Files have been copied to the root directory and assets restructured."
