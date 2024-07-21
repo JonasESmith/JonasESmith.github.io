@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:go_router/go_router.dart';
 import 'package:portfolio/src/core/core.dart';
 import 'package:portfolio/src/core/utils/utils.dart';
@@ -86,41 +87,39 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => HomeBloc()..add(const HomeEvent.started()),
-      child: BlocBuilder<HomeBloc, HomeState>(
-        builder: (context, state) {
-          return state.when(
-            uninitialized: () => const SizedBox(),
-            loaded: (data) => Provider.value(
-              value: data,
-              child: ChangeNotifierProvider.value(
-                value: controller,
-                child: Consumer<ThemeController>(
-                  builder: (context, themeController, child) {
-                    final theme = themeController.useFlexColorScheme //
-                        ? flexThemeLight(themeController)
-                        : themeDataLight(themeController);
+    return BlocBuilder<HomeBloc, HomeState>(
+      bloc: Modular.get<HomeBloc>(),
+      builder: (context, state) {
+        return state.when(
+          uninitialized: () => const SizedBox(),
+          loaded: (data) => Provider.value(
+            value: data,
+            child: ChangeNotifierProvider.value(
+              value: controller,
+              child: Consumer<ThemeController>(
+                builder: (context, themeController, child) {
+                  final theme = themeController.useFlexColorScheme //
+                      ? flexThemeLight(themeController)
+                      : themeDataLight(themeController);
 
-                    final dTheme = themeController.useFlexColorScheme //
-                        ? flexThemeDark(themeController)
-                        : themeDataDark(themeController);
+                  final dTheme = themeController.useFlexColorScheme //
+                      ? flexThemeDark(themeController)
+                      : themeDataDark(themeController);
 
-                    return MaterialApp.router(
-                      theme: theme,
-                      darkTheme: dTheme,
-                      title: 'Portfolio',
-                      routerConfig: router,
-                      debugShowCheckedModeBanner: false,
-                      themeMode: themeController.themeMode,
-                    );
-                  },
-                ),
+                  return MaterialApp.router(
+                    theme: theme,
+                    darkTheme: dTheme,
+                    title: 'Portfolio',
+                    routerConfig: router,
+                    debugShowCheckedModeBanner: false,
+                    themeMode: themeController.themeMode,
+                  );
+                },
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

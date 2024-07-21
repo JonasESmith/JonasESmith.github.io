@@ -15,10 +15,10 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final appData = Provider.of<AppData>(context);
 
-    return PageWrapper(
-      child: VoxMouseFollower(
-        colorOpacity: appData.mouseFollowerOpacity,
-        enabled: appData.showMouseFollower,
+    return VoxMouseFollower(
+      colorOpacity: appData.mouseFollowerOpacity,
+      enabled: appData.showMouseFollower,
+      child: PageWrapper(
         child: PageSettingsWrapper(
           child: child,
         ),
