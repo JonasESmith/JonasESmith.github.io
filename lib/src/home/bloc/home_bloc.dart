@@ -75,7 +75,7 @@ class HomeBloc extends HydratedBloc<HomeEvent, HomeState> {
     var path = "images";
 
     if (!kDebugMode) {
-      path = "images/compressed";
+      path = "images";
     }
 
     return AppData(
