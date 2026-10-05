@@ -221,10 +221,29 @@ Each page ships:
 - **Mode and scheme labels:** switched by CSS from `data-*` attributes.
 - **Scheme picker:** the native `popover` attribute.
 
-### JS (`gen/static/site.js`)
+### JS (`gen/static/site.js`, 5.3KB raw, ~2KB br, deferred)
 
-- Mode / scheme / follower toggles, persisted to `localStorage`. Keys: `mode`, `scheme`, `follower`.
-- Refreshes the version string and skill years at load. The HTML holds build-time values as the fallback.
+- **Toggles:** mode, scheme and follower, persisted to `localStorage` (keys `mode`, `scheme`, `follower`).
+- **Palette:** Cmd/Ctrl+P toggles it, which also blocks the print dialog the way `prevent_default.js` did. Case-insensitive search; ↑/↓ cycle schemes and Enter closes. Opening it focuses the search field on pointer devices.
+- **Cursor follower:** two radial-gradient glows (secondary 12% → primary 6% → tertiary 3% → transparent). An exponential lerp approximates Flutter's 700ms / 1400ms easeOutCubic lag. The small glow orbits the cursor at 100px via a CSS animation. The rAF loop runs only while catching up.
+  - Touch devices: a static ambient glow.
+  - `prefers-reduced-motion`: static.
+  - "Mouse Shadow" in the footer hides it.
+- **Lightbox:** a native `<dialog>` with backdrop blur. Back pill, "Image n / N" pager, ←/→ keys, swipe, and Esc or backdrop click to close. Without JS the gallery links open the 2x AVIF directly.
+- **Code blocks:** copy button with a check-mark confirmation for 2s.
+- **Dates:** refreshes the version string and skill years at load; the HTML holds build-time values as the fallback.
+
+### Build-time code highlighting (`gen/src/highlight.rs`)
+
+- A small tokenizer emits one-letter span classes (comment, keyword, string, number, type, function, attribute/macro).
+- Keyword sets: Rust, shell, JS/TS, Dart and Python; other languages get generic highlighting.
+- Colours are Flutter's a11y-light / a11y-dark palettes.
+- No runtime JS and no highlighting library.
+
+### Accessibility
+
+- **Contrast:** `theme.rs` derives `--link`, `--link-v` and `--p-text`, nudged per scheme until they reach ≥4.5:1 on every surface. Muted text uses `--muted` (72% on-surface), not the disabled colour.
+- **Headings:** markdown headings are re-ranked to consecutive levels starting at h2, under the page-title h1. A `.hN` class keeps the authored size.
 
 ### Image pipeline (`gen/src/assets.rs`)
 
@@ -277,6 +296,9 @@ Each page ships:
 ### Deliberate deviations from Flutter
 
 - "Noteable" is fixed to "Notable".
+- ↑/↓ cycle schemes only while the palette is open. Flutter cycled globally, but on the web that would hijack page scrolling.
+- The cursor glow uses gradients that fade to transparent rather than a full-screen 100σ backdrop blur, which is too expensive on mobile GPUs. The 5% noise layer is dropped: under Flutter's blur it was invisible.
+- Link colours are slightly darker in light mode and lighter in dark mode than iOS #007AFF / #AF52DE, to pass WCAG AA.
 - The scheme persists between visits; Flutter reset it to Midnight on every load.
 - Entrance animations start immediately and finish within 600ms. Flutter waited 600ms first.
 - The broken profile link (BFS → Eqalink) is fixed.
@@ -316,7 +338,7 @@ Each page ships:
     - standard `![](x)` image paths are never rewritten
     - output names collide on file stem
     - changing params doesn't invalidate cached outputs
-- [ ] **P4 Look & feel:**
+- [x] **P4 Look & feel** (done 2026-10-05; see §3 JS / highlighting / accessibility). Original plan:
   - Cursor follower: rAF lerp; CSS `filter: blur` on the blobs; off for `pointer: coarse` and reduced motion.
   - Cmd+P palette: search, and ↑/↓ to cycle schemes.
   - Gallery lightbox with `<dialog>`; each gallery link already points at the 2x AVIF.
@@ -350,11 +372,16 @@ Each page ships:
 | 2026-10-05 | gen P3 | `/project/Rock-Climber-Guide/` | 5.8KB | 0 | 1.5KB | 70KB (150KB lazy) | **100 / 1.7s** | |
 | 2026-10-05 | gen P3 | `/project/Better-Fantasy-System/` | 5.6KB | 0 | 1.5KB | 83KB (95KB lazy) | **100 / 1.5s** | |
 | 2026-10-05 | gen P3 | `/project/Pakmo/` | 5.1KB | 0 | 1.5KB | 33KB | **100 / 1.2s** | |
+| 2026-10-05 | gen P4 | `/` | 6.4KB | 0 | 5.3KB (≈2KB br) | 17KB | **100 / 1.2s**; a11y, best practices and SEO 100 | Palette, glow, lightbox, highlighting added |
+| 2026-10-05 | gen P4 | `/project/Eqalink/` | 6.9KB | 0 | ≈2KB br | 63KB | **100 / 1.7s**; a11y, best practices and SEO 100 | |
+| 2026-10-05 | gen P4 | `/project/Portfolio/` | 6.4KB | 0 | ≈2KB br | 10KB | **100 / 1.1s**; a11y, best practices and SEO 100 | Highlighted code blocks |
+| 2026-10-05 | gen P4 | `/project/Rock-Climber-Guide/` | 6.9KB | 0 | ≈2KB br | 72KB | **100 / 1.7s**; a11y, best practices and SEO 100 | |
 
 Lighthouse notes:
 - **The LCP number is mostly simulation.** Observed LCP locally is 32–38ms on every page. Lighthouse picks the `~` gutter text as the LCP element, because the gallery fades in from `opacity:0` and Chrome excludes it. The simulated LCP (1.5–1.7s on slow 4G) then charges the high-priority 2x screenshots that download alongside it. If the screenshots should count as the LCP, drop the `b2` fade on `.gallery`.
 - The local `http.server` has no compression or cache headers, so ignore the text-compression and cache-TTL audits. GitHub Pages serves gzip with `max-age=600`.
-- Open a11y items: colour contrast, and heading order on project pages.
+- Accessibility is 100 since P4 (contrast and heading order fixed). The remaining non-scored flag is `unused-css-rules`: one inline stylesheet serves all page types, about 2KB of rules that are unused on any given page. That's acceptable at this size.
+- In Lighthouse runs, the first run after starting `just serve` sometimes fails with `CHROME_INTERSTITIAL_ERROR`. Rerun it.
 
 ---
 
@@ -377,6 +404,12 @@ Lighthouse notes:
   - **Lighthouse:** Performance 100 on all 5 pages tested.
   - **Report fix:** `gen report` now counts the largest AVIF candidate in `<picture>` rather than the fallback.
   - **Next:** P4 look & feel.
+- **2026-10-05 (P4)**
+  - Committed P0–P3 as `ee8cc46`.
+  - Built: Cmd+P palette with search, cursor-follower glow, `<dialog>` lightbox, build-time highlighting with copy buttons, contrast-safe link/text colours per scheme, heading re-ranking.
+  - Lighthouse: 100 in every category on 4 pages.
+  - Verified with a puppeteer-core script: glow tracking, palette filter, mode persistence, lightbox paging, code blocks in both modes, mobile layout. No console errors.
+  - **Next:** P5 (compare surfaces against the live Flutter site, CI budget check), then P6 deploy.
 
 ---
 

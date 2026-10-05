@@ -76,7 +76,19 @@ fn chrome(site: &Site, themes: &Themes, assets: &mut Assets) -> Result<Chrome> {
         "<a class=\"bb email\" href=\"mailto:{}?subject=Hello&amp;body=I%20would%20love%20to%20speak%20soon!\">email</a>",
         esc(&site.profile.email)
     )?;
-    f.push_str("</nav></footer><div id=\"schemes\" popover><div class=\"pal\">");
+    write!(
+        f,
+        "</nav></footer><div id=\"schemes\" popover aria-label=\"Colour scheme\"><div class=\"pal-h\">\
+         <input id=\"pal-q\" type=\"search\" placeholder=\"Search themes\" aria-label=\"Search themes\" autocomplete=\"off\">\
+         <button class=\"pal-b\" data-act=\"prev\" type=\"button\" aria-label=\"Previous scheme\">{}</button>\
+         <button class=\"pal-b\" data-act=\"next\" type=\"button\" aria-label=\"Next scheme\">{}</button>\
+         <button class=\"pal-b\" data-act=\"mode\" type=\"button\" aria-label=\"Toggle light or dark\">\
+         <span class=\"m-d\">{}</span><span class=\"m-l\">{}</span></button></div><div class=\"pal\">",
+        icon(CHEVRON_UP),
+        icon(CHEVRON_DOWN),
+        icon(MOON),
+        icon(SUN)
+    )?;
     for s in &themes.scheme {
         write!(
             f,
@@ -96,6 +108,7 @@ fn shell(chrome: &Chrome, title: &str, desc: &str, main: &str) -> String {
     format!(
         "<!doctype html><html lang=\"en\" data-scheme=\"midnight\"><head><title>{}</title>\
          <meta name=\"description\" content=\"{}\">{}</head><body>\
+         <div class=\"glow\" aria-hidden=\"true\"><i class=\"g1\"></i><i class=\"g2\"><i></i></i></div>\
          <div class=\"app\"><pre class=\"gutter\" aria-hidden=\"true\">{gutter}</pre><main>{main}</main></div>{}</body></html>",
         esc(title),
         esc(desc),
@@ -249,6 +262,20 @@ fn project(p: &Project, site: &Site, assets: &mut Assets, chrome: &Chrome) -> Re
 
     let body = markdown::render(&p.body, site, assets, &p.title);
     write!(m, "<hr class=\"pdiv\"><article class=\"md b3\">{body}</article></div>")?;
+    if !p.gallery.is_empty() {
+        // Lightbox shell; site.js fills it from the gallery links.
+        write!(
+            m,
+            "<dialog id=\"lb\" aria-label=\"{0} screenshots\"><div class=\"lb-bar\">\
+             <button class=\"lb-pill\" data-act=\"lb-close\" type=\"button\">{1}{0}</button>\
+             <div class=\"lb-pill lb-pager\"><button data-act=\"lb-prev\" type=\"button\" aria-label=\"Previous image\">{1}</button>\
+             <span class=\"lb-n\"></span><button data-act=\"lb-next\" type=\"button\" aria-label=\"Next image\">{2}</button></div></div>\
+             <img class=\"lb-img\" alt=\"\"></dialog>",
+            esc(&p.title),
+            icon(CHEVRON_BACK),
+            icon(CHEVRON_FWD)
+        )?;
+    }
 
     let desc = p.description.clone().unwrap_or_else(|| p.title.clone());
     Ok(shell(chrome, &format!("{} · {}", p.title, site.profile.name), &desc, &m))
@@ -302,13 +329,15 @@ fn minify_css(css: &str) -> String {
     out.replace(";}", "}")
 }
 
-fn icon(paths: &str) -> String {
+pub fn icon(paths: &str) -> String {
     format!("<svg class=\"i\" viewBox=\"0 0 24 24\" aria-hidden=\"true\">{paths}</svg>")
 }
 
 // Icons: simplified line glyphs (24px grid), stroked with currentColor via `.i` in site.css.
 const CHEVRON_DOWN: &str = "<path d=\"m6 9 6 6 6-6\"/>";
 const CHEVRON_BACK: &str = "<path d=\"m15 18-6-6 6-6\"/>";
+const CHEVRON_FWD: &str = "<path d=\"m9 18 6-6-6-6\"/>";
+const CHEVRON_UP: &str = "<path d=\"m18 15-6-6-6 6\"/>";
 const CHEVRON_UP_SQUARE: &str = "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"4\"/><path d=\"m8 14 4-4 4 4\"/>";
 const KEYBOARD_CHEVRON: &str = "<path d=\"m4 10 8 4 8-4\"/>";
 const CHART_BAR: &str = "<path d=\"M3 3v18h18M8 17v-3M13 17V5M18 17V9\"/>";
@@ -321,4 +350,6 @@ const APPLE: &str = "<path d=\"M12 20.9c1.5 0 2.8 1.1 4 1.1 3 0 6-8 6-12.2A4.9 4
 const ANDROID: &str = "<path d=\"M5 18V11a7 7 0 0 1 14 0v7Z\"/><path d=\"M8 5 6.5 3M16 5l1.5-2M9.5 10h.01M14.5 10h.01\"/>";
 const GLOBE: &str = "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20\"/>";
 const TABLET: &str = "<rect x=\"4\" y=\"2\" width=\"16\" height=\"20\" rx=\"2\"/><path d=\"M12 18h.01\"/>";
+pub const COPY: &str = "<rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/>";
+pub const CHECK: &str = "<path d=\"M20 6 9 17l-5-5\"/>";
 const DESKTOP: &str = "<rect x=\"2\" y=\"3\" width=\"20\" height=\"14\" rx=\"2\"/><path d=\"M8 21h8M12 17v4\"/>";

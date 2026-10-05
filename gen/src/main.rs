@@ -4,6 +4,7 @@
 //! gen report [--out dist] [--save perf]
 
 mod assets;
+mod highlight;
 mod markdown;
 mod page;
 mod report;

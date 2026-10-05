@@ -6,12 +6,18 @@
 //!   Trailing flags: `--ascii`, `--dither [--4|--8|--16]`, `--accent`
 //! - `![[art.txt]]` -> prebuilt ASCII art
 //!
-//! Then pulldown-cmark renders CommonMark + tables/strikethrough/task lists.
+//! Then pulldown-cmark renders CommonMark + tables/strikethrough/task lists, with two event rewrites:
+//! - code blocks: build-time highlighting + language label + copy button
+//! - headings: levels used in the note are compressed to consecutive ranks starting at h2 (the page
+//!   title is the h1), keeping the authored size via an `hN` class. Fixes skipped-level a11y errors.
 
 use crate::assets::{invert_ascii, Assets, Fit};
 use crate::page::esc;
 use crate::vault::Site;
-use pulldown_cmark::{html, Options, Parser};
+use crate::highlight::highlight;
+use crate::page::{icon, CHECK, COPY};
+use pulldown_cmark::{html, CodeBlockKind, Event, Options, Parser, Tag, TagEnd};
+use std::collections::BTreeSet;
 
 /// Inline image box: content column (900px project column minus padding) × a viewport-friendly height.
 const INLINE_W: u32 = 880;
@@ -23,7 +29,41 @@ pub fn render(md: &str, site: &Site, assets: &mut Assets, ctx: &str) -> String {
     let pre = preprocess(md, site, assets, ctx);
     let mut out = String::with_capacity(pre.len() * 3 / 2);
     let opts = Options::ENABLE_TABLES | Options::ENABLE_STRIKETHROUGH | Options::ENABLE_TASKLISTS;
-    html::push_html(&mut out, Parser::new_ext(&pre, opts));
+    let events: Vec<Event> = Parser::new_ext(&pre, opts).collect();
+
+    let used: BTreeSet<usize> = events
+        .iter()
+        .filter_map(|e| match e {
+            Event::Start(Tag::Heading { level, .. }) => Some(*level as usize),
+            _ => None,
+        })
+        .collect();
+    let rank = |level: usize| (2 + used.iter().position(|&l| l == level).unwrap_or(0)).min(6);
+
+    let mut rewritten = Vec::with_capacity(events.len());
+    let mut code: Option<(String, String)> = None;
+    for e in events {
+        match e {
+            Event::Start(Tag::Heading { level, .. }) => {
+                rewritten.push(Event::Html(format!("<h{} class=\"h{}\">", rank(level as usize), level as usize).into()))
+            }
+            Event::End(TagEnd::Heading(level)) => rewritten.push(Event::Html(format!("</h{}>", rank(level as usize)).into())),
+            Event::Start(Tag::CodeBlock(kind)) => {
+                let lang = match kind {
+                    CodeBlockKind::Fenced(l) => l.split_whitespace().next().unwrap_or("").to_string(),
+                    CodeBlockKind::Indented => String::new(),
+                };
+                code = Some((lang, String::new()));
+            }
+            Event::Text(t) if code.is_some() => code.as_mut().unwrap().1.push_str(&t),
+            Event::End(TagEnd::CodeBlock) => {
+                let (lang, src) = code.take().unwrap_or_default();
+                rewritten.push(Event::Html(code_block(&lang, &src).into()));
+            }
+            other => rewritten.push(other),
+        }
+    }
+    html::push_html(&mut out, rewritten.into_iter());
     out.replace("<a href=\"http", "<a target=\"_blank\" rel=\"noopener\" href=\"http")
 }
 
@@ -145,6 +185,18 @@ fn embed(e: &Embed, in_strip: bool, assets: &mut Assets, ctx: &str) -> Option<St
             None
         }
     }
+}
+
+fn code_block(lang: &str, src: &str) -> String {
+    let label = if lang.is_empty() { "text" } else { lang };
+    format!(
+        "<div class=\"code\"><div class=\"code-h\"><span>{}</span><button class=\"copy\" type=\"button\" data-act=\"copy\" \
+         aria-label=\"Copy code\">{}{}</button></div><pre><code>{}</code></pre></div>",
+        esc(label),
+        icon(COPY),
+        icon(CHECK),
+        highlight(src.trim_end_matches('\n'), lang)
+    )
 }
 
 /// Dark and light variants; CSS shows the one matching the mode and scales the font so `--cols`

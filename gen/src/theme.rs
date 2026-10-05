@@ -39,6 +39,17 @@ impl Rgb {
         };
         0.2126 * ch(self.0) + 0.7152 * ch(self.1) + 0.0722 * ch(self.2)
     }
+    fn contrast(self, o: Rgb) -> f64 {
+        let (a, b) = (self.luminance(), o.luminance());
+        (a.max(b) + 0.05) / (a.min(b) + 0.05)
+    }
+    /// Smallest step toward `toward` that reaches WCAG AA (4.5:1, with margin) against every bg.
+    fn legible_on(self, bgs: &[Rgb], toward: Rgb) -> Rgb {
+        (0..=50)
+            .map(|i| self.mix(toward, i as f64 * 0.02))
+            .find(|c| bgs.iter().all(|bg| c.contrast(*bg) >= 4.6))
+            .unwrap_or(toward)
+    }
     fn hex(self) -> String {
         format!("#{:02x}{:02x}{:02x}", self.0.round() as u8, self.1.round() as u8, self.2.round() as u8)
     }
@@ -86,8 +97,17 @@ fn vars(c: &[String; 3], dark: bool) -> Result<String> {
     let p_light = p.luminance() > 0.5;
     // Footer bar: card @ 30% over the scaffold, flattened so content scrolling underneath can't show through.
     let bar = bg.mix(card, 0.3);
+    // Text-safe variants: Flutter used iOS #007AFF / #AF52DE links and raw primary for link-ish text,
+    // which fail AA on several surfaces. Nudge toward black (light) / white (dark) only as far as needed.
+    let card_on_bg = bg.mix(p, 0.05);
+    let toward = if dark { white } else { black };
+    let surfaces = [bg, card_on_bg, card];
+    let link = Rgb(0.0, 122.0, 255.0).legible_on(&surfaces, toward);
+    let link_v = Rgb(175.0, 82.0, 222.0).legible_on(&surfaces, toward);
+    let p_text = p.legible_on(&[bg, bg.mix(p, 0.1)], toward);
     Ok(format!(
-        "--p:{};--s:{};--t:{};--bg:{};--card:{};--bar:{};--fg:{};--div:{};--dis:{};--on-p:{};--icon-fg:{}",
+        "--p:{};--s:{};--t:{};--bg:{};--card:{};--bar:{};--fg:{};--div:{};--dis:{};--muted:{};--on-p:{};--icon-fg:{};\
+         --link:{};--link-v:{};--p-text:{}",
         p.hex(),
         s.hex(),
         t.hex(),
@@ -97,8 +117,12 @@ fn vars(c: &[String; 3], dark: bool) -> Result<String> {
         on.hex(),
         bg.mix(on, 0.12).hex(),
         bg.mix(on, 0.38).hex(),
+        bg.mix(on, 0.72).hex(),
         on_p.hex(),
         if p_light { "rgba(0,0,0,.87)" } else { "rgba(255,255,255,.7)" },
+        link.hex(),
+        link_v.hex(),
+        p_text.hex(),
     ))
 }
 
