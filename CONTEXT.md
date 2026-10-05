@@ -197,7 +197,28 @@ public/ ──(verbatim)──► page.rs       templates; inline CSS + init scr
 | `just check` | CI gate: build, then fail if any page is over budget (`gen report --check`) |
 | `just lighthouse-all` | Lighthouse on every page. Starts its own server, warms each URL, retries interstitials. Summary goes to `perf/lighthouse-<date>-<rev>.md`. |
 
-CI: `.github/workflows/ci.yml` runs build and `report --check` on every push and PR, and appends the size report to the job summary. Encoded images are cached between runs.
+### CI / deploy (`.github/workflows/deploy.yml`)
+
+One workflow handles everything:
+- **Every push and PR:** build, then `report --check`; the size report goes to the job summary.
+- **Pushes to `master` and manual runs:** additionally upload `dist/` and deploy to Pages.
+- **Concurrency:** a newer push to the same ref cancels the older run.
+
+Caching, modelled on horro_campaign's cached `dx` binary:
+
+| Cache | Key | Effect |
+|---|---|---|
+| `bin/gen` (compiled generator) | hash of `gen/src`, `gen/static`, `themes.toml`, `Cargo.toml/lock` | Content-only pushes skip nasm, the Rust toolchain and the compile |
+| Rust deps (`Swatinem/rust-cache`, `cache-on-failure`) | lockfile | Generator changes recompile only our crate |
+| `.cache/img` | `assets.rs` hash + vault hash, prefix fallback | Only new or changed images encode |
+
+Caches saved on `master` are readable by every branch; branch caches are readable only by that branch.
+
+**One-time GitHub settings** (repo owner):
+1. **Settings → Pages → Build and deployment → Source: GitHub Actions.** Leave Custom domain empty. HTTPS is automatic on github.io.
+2. **Settings → Environments → `github-pages`** (created by step 1): Deployment branches should allow `master`. The default rule is the default branch, which is `master`.
+3. **Settings → Actions → General:** Actions permissions must allow the actions used (`actions/*`, `dtolnay/rust-toolchain`, `Swatinem/rust-cache`); "Allow all actions" is the default. Workflow permissions can stay read-only, because the workflow requests `pages: write` / `id-token: write` itself.
+4. No secrets are needed.
 
 ### Output
 
