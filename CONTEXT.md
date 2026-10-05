@@ -323,7 +323,7 @@ Each page ships:
 | 3 | Font | **System UI stack**; no web-font request |
 | 4 | Generator home | **New crate in this repo**: `gen/` |
 | 5 | Privacy | **`/no-data.html` unchanged**: same URL, same content (store listings point at it) |
-| 6 | Deploy | *Open*: GitHub Actions → Pages (recommended), plus removing the Flutter artifacts from `master`. Custom domain? |
+| 6 | Deploy | **GitHub Actions → Pages** (`deploy.yml` on push to `master`), with the Flutter build removed from the repo. No custom domain for now: `www.jonasesmith.com` is a Namecheap parking page. To use it later, point DNS at Pages and add `public/CNAME`. |
 | 7 | Extra content (Yutori, Acro-yoga) | *Open*: currently drafts. Flip `draft: false` to publish. |
 
 ---
@@ -357,7 +357,7 @@ Each page ships:
   - Preload the LCP image. *Not needed:* the first screenshot is already in the initial HTML with `fetchpriority=high`, and observed LCP is 41–322ms locally.
   - CI budget check that fails `gen report` when over budget.
   - Lighthouse on every page.
-- [ ] **P6 Deploy:**
+- [ ] **P6 Deploy** (in progress). Original plan:
   - Actions → Pages.
   - Remove the Flutter build artifacts and sources from `master`: `lib/`, `canvaskit/`, `assets/`, `images/`, `main.dart.js`, platform folders, `portfolio_data/`, `compress_images/`.
   - Delete the gitignored `rust-port/target` and `image_manager/target` directories locally (~4.3G).
@@ -427,6 +427,19 @@ Lighthouse notes:
     - `unused-css-rules` (one shared inline stylesheet).
     - `uses-responsive-images`: the Lighthouse device is DPR 1.75, so 2x is slightly larger than needed. A 1.5x variant would shave ~15KB per page; not worth it yet.
   - **Next:** P6 deploy. Measure real-network load on GitHub Pages afterwards, since the <400ms goal can only be confirmed there.
+- **2026-10-05 (P6)**
+  - Committed P5 as `d1302ce`.
+  - Added `deploy.yml` (build → `report --check` → upload-pages-artifact → deploy-pages); `ci.yml` now skips `master`.
+  - Removed 374 Flutter files from git: the build output at the root, `lib/`, the platform folders, `images/`, `assets/`, `canvaskit/`, `portfolio_data/`, `compress_images/`. The vault holds byte-identical copies of the source images.
+  - `public/flutter_service_worker.js` is a kill switch: the old site registered a service worker that would keep serving cached Flutter to returning visitors.
+  - `public/home/` redirects the old `/home` route.
+  - `/no-data.html` verified byte-identical to the live copy.
+  - Pushed `rust-rewrite` (`367c5e8`); CI is green on GitHub.
+  - **Switch-over order:**
+    1. Pages Source → GitHub Actions. This is a repo setting and needs the owner, since `gh` isn't installed here. The old deployment keeps serving until a new one lands.
+    2. Merge `rust-rewrite` into `master` and push.
+    3. `deploy.yml` publishes.
+    4. Verify live: pages, `/no-data.html` bytes, real-network timing.
 
 ---
 
