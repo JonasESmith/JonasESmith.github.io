@@ -1,0 +1,52 @@
+# Curated colour schemes (subset of the Flutter site's FlexColorScheme list).
+# Source values: flex_color_scheme 7.3.1 `flex_color.dart` / vox_flex_theme `app_color.dart`.
+# Surfaces, dividers and on-colours are derived in gen/src/theme.rs.
+# The first scheme is the default.
+
+[[scheme]]
+id = "midnight"
+name = "Midnight"
+light = ["#00296B", "#D26900", "#5C5C95"]
+dark = ["#B1CFF5", "#FFD270", "#C9CBFC"]
+
+[[scheme]]
+id = "blue-whale"
+name = "Blue whale"
+light = ["#023047", "#F86541", "#F07E24"]
+dark = ["#57859D", "#FF6E48", "#ED7F29"]
+
+[[scheme]]
+id = "espresso"
+name = "Espresso and crema"
+light = ["#452F2B", "#E3B964", "#F5E9C9"]
+dark = ["#8D7F7D", "#EED6A6", "#F8ECD4"]
+
+[[scheme]]
+id = "green-forest"
+name = "Green forest"
+light = ["#2E7D32", "#00695C", "#004D40"]
+dark = ["#A5D6A7", "#80CBC4", "#4DB6AC"]
+
+[[scheme]]
+id = "rosewood"
+name = "Rosewood"
+light = ["#5C000E", "#74540E", "#AD8845"]
+dark = ["#9C5A69", "#EDCE9B", "#F5DFB9"]
+
+[[scheme]]
+id = "shark-orange"
+name = "Shark and orange"
+light = ["#1D2228", "#FB8122", "#EA9654"]
+dark = ["#777A7E", "#FCB075", "#EFB383"]
+
+[[scheme]]
+id = "m3-purple"
+name = "Material 3 purple"
+light = ["#6750A4", "#625B71", "#7D5260"]
+dark = ["#D0BCFF", "#CCC2DC", "#EFB8C8"]
+
+[[scheme]]
+id = "mosque-cyan"
+name = "Mosque cyan"
+light = ["#006876", "#476365", "#585C82"]
+dark = ["#44D8F1", "#AECCCE", "#C0C3EF"]

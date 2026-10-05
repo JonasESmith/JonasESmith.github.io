@@ -1,0 +1,420 @@
+# CONTEXT.md — Portfolio rewrite
+
+Working context for rebuilding jonasesmith.github.io: the same look and feel as the current Flutter site, sourced from an Obsidian vault, with a **sub-400ms load**. Update the **Progress log** and **Perf reports** sections as work lands.
+
+---
+
+## 1. Goals
+
+| Goal | Target |
+|---|---|
+| Load time (cold, mid-tier mobile, 4G) | < 400ms to LCP on a real connection. Content must be in the first HTML response. Lighthouse's simulated slow 4G (150ms RTT, 1.6Mbps) can't report much below ~0.8s FCP for any page, so track Lighthouse **Performance = 100 and LCP ≤ 1.2s** as the CI proxy. |
+| Critical payload | HTML + inline CSS ≤ 14KB compressed (one TCP round trip). JS ≤ 10KB, deferred, never blocking render. |
+| Content source | An Obsidian vault (markdown + frontmatter) feeds the build. No hardcoded content. |
+| Look & feel | Keep: theme picker (Cmd+P palette + footer), light/dark, following-cursor glow, IDE-style footer, tilde gutter, staggered fades. |
+| Images | Build-time AVIF compression, ASCII art, and dithering, all driven by flags in the vault markdown. |
+| Privacy | `/no-data.html` is the privacy-policy URL in the App Store / Play Store listings. **Keep the URL and content exactly as they are**: it's copied byte-for-byte from `public/`. The rest of the site makes no third-party requests and only stores theme preferences in `localStorage`. |
+| Mobile | First-class. Touch fallback for the cursor effect, footer reflow at < 600px. |
+
+---
+
+## 2. Current state (as of 2026-10-05)
+
+### Repo / branches
+
+- `master` == `rust-rewrite` (both at `0bba8e6`). This is the **Flutter build output committed at the repo root**, served by GitHub Pages.
+- The Dioxus work lives on other branches (`master → dioxus-obsidian-builder → dioxus-text-viewer → dioxus-rust-port`).
+  - Only **`dioxus-rust-port`** (`1b63dfb`) is worth mining. The other two are fully contained in it or superseded.
+  - Read its files with `git show "dioxus-rust-port:rust-port/..."`.
+- `rust-port/` and `image_manager/` in this working tree are gitignored leftovers: `target/` dirs of 3.1G and 1.2G, no source.
+- `vault/` here is empty. The vault notes (`About me/`, `Skills/`, `Projects/`) live on the `dioxus-*` branches.
+
+### Live Flutter site: baseline (measured 2026-10-05)
+
+| Resource | Transferred (compressed) |
+|---|---|
+| `index.html` | 948 B |
+| `main.dart.js` | **1.29 MB** (4.3 MB raw) |
+| `canvaskit.wasm` | **2.0–2.7 MB** (6.7 MB raw; often fetched from gstatic, not locally) |
+| Noto Sans | fetched from fonts.gstatic.com at runtime |
+
+- Roughly **3.3 MB+ before first paint**. Content is painted to a canvas, so search engines see none of it and none of it is accessible.
+- Root `index.html` has no viewport meta, description "A new Flutter project.", and title "portfolio".
+
+### Flutter site: what it actually is
+
+**Routes**
+- `/home`: profile card plus the "Noteable Projects" and "Skills" lists. Column is 500px wide with 160px of top/bottom space.
+- `/project/:title-with-dashes`: 900px column containing:
+  - back/title pill
+  - platform icons
+  - technology chips
+  - horizontal screenshot gallery that opens a fullscreen viewer
+  - markdown body
+- All other routes in `main_module.dart` are dead, including `/settings`, `/skills` and `/experience`.
+
+**Content** is a hardcoded Dart literal in `lib/src/home/bloc/home_bloc.dart:72-788`.
+- **Projects:** Eqalink, Portfolio, Rock Climber Guide, Better Fantasy System, Pakmo.
+- **Skills:** Flutter, Rust, UI/UX, Python, .Net, Pencil Drawing, Wood Working.
+- **Profile:**
+  - Version string is the age since 1995-12-03, shown as `v{years}.{days}`.
+  - Links: GitHub, Instagram, LinkedIn, email.
+- The `dioxus-rust-port` copy, `rust-port/assets/work.json` (29KB), also has Yutori, Acro-yoga, and the MWI ASCII art.
+
+**Shell**
+- 20px `~` gutter on the left, vim-style.
+- IDE status-bar footer:
+  - Left group: [Dark/Light] [scheme name ⌃] [Mouse Shadow].
+  - Right group: github / instagram / linkedin / email. On mobile (< 600px) this moves to a second row and drops email.
+
+**Themes**
+- 55 FlexColorScheme schemes, listed with hex values in the appendix.
+- Default is "Midnight". **The scheme is force-reset to Midnight on every load** (`main.dart:27`), which is a bug. Mode follows the system.
+- Picker: a Cmd+P palette that is 600px wide, top-centred, with search, ↑/↓ cycling and a sun/moon toggle. Each row shows three colour dots and a name.
+- Surfaces are computed: Material 3, `levelSurfacesLowScaffold`, blend 7 (light) / 13 (dark).
+
+**Cursor follower** (`vox_widgets` `VoxMouseFollower`)
+- Radial gradient with stops `secondary@.12 → primary@.06 → tertiary@.03`.
+- Two discs:
+  - Big: 1000px, lags 700ms easeOutCubic.
+  - Small: 300px, lags 1400ms easeOutCubic, orbiting the cursor at a 100px radius.
+- Both spin slowly; one cycle takes a random 15–24s.
+- Above them: 100σ blur over everything, plus 5000-dot white noise at 5%.
+- Hover only, so nothing on touch. Can be toggled from the footer.
+
+**Typography & colour**
+- Noto Sans. Markdown body uses `bodySmall`.
+- Links are #007AFF; visited links are #AF52DE.
+
+**Motion**
+- Home: 600ms delay, then a staggered fade and slide (card, then projects, then skills).
+- Project page: 1200ms stagger (chips, then gallery, then body).
+
+**Privacy**
+- `no-data.html` reads "No Data is Collected — This application does not collect any personal data."
+- It is linked from a footer in root `index.html`, but the Flutter canvas probably covers that footer.
+- The page is **not quite true** today:
+  - Google Fonts and gstatic CanvasKit fetches leak IPs to Google.
+  - HydratedBloc/Hive write IndexedDB (all content, visited projects, theme).
+
+**Hacks to drop**
+- `build.sh` asset shuffling, which leaves duplicated `assets/` trees (65MB).
+- The 404 sessionStorage redirect trick.
+- `prevent_default.js` (blocks Cmd+P printing).
+- Manual `main.dart.js` edits.
+- `portfolio_data` (Rust → Dart quicktype codegen).
+
+### dioxus-rust-port (previous rewrite attempt)
+
+- Dioxus 0.7.1 with an Obsidian-style layout: sidebar file tree, content panel, light/dark theme, 7 OKLCH accent presets, a hand-rolled markdown parser (~1350 lines), ASCII image component, and image carousel.
+- Release build: **wasm 262KB brotli** + JS 10.5KB + CSS 4.6KB (+ a 133KB favicon).
+- That is much better than Flutter but still client-rendered, so wasm must download, compile and run before content shows.
+- Gaps:
+  - No cursor follower.
+  - No privacy page.
+  - Project screenshots are never rendered, but every image ships anyway.
+  - The `/project/<slug>` links in content are broken (the route expects `i32`).
+
+### diobsidian (`~/Projects/diobsidian`) — the pipeline we like
+
+`frontend/build.rs` (2,317 lines) is the valuable part.
+
+**Vault reading**
+- Vault walk that skips dotfiles.
+- Slugs with collision handling.
+- Wikilinks `[[x|y]]`.
+- Frontmatter:
+  - Runtime parsing handles title, subtitle, author, start/end date and tags.
+  - Build time extracts `title:` only.
+
+**Image flags** go after the image ref, e.g. `![[img.png]] --dither --8 --accent`:
+- `--ASCII`
+- `--dither [--4|--8|--16]`
+- `--accent`
+- `--max`
+
+**AVIF**
+- EXIF orientation applied first.
+- Resized to ≤ 1200w with Lanczos3.
+- `ravif` starting at q85; each pass drops quality by 5 and scale by 0.05, until the file is ≤ 25KB.
+
+**ASCII**
+- `rascii_art`, width 120, charset `" ·∘:░▒▓█"`.
+- Inverted for the light theme at runtime.
+
+**Dither**
+- Resize to ≤ 600w, convert to grayscale, quantise to N levels.
+- Floyd–Steinberg error diffusion.
+- Write a PNG:
+  - `--accent`: grayscale, tinted at runtime with an accent overlay (`mix-blend-multiply`, 30%).
+  - Otherwise: a baked navy→cream duotone, (20,22,40) → (240,235,220).
+
+**Extras**
+- Trigram search index, RSS, AES-GCM hidden notes, `diob` CLI.
+
+**Runtime problems (why not reuse the runtime as-is)**
+- Pure CSR: all page text, the search index and the dithered PNGs are compiled into the wasm, about 1.47MB of content.
+- Nothing is prerendered.
+- Markdown is re-parsed on every render.
+- nginx has no compression.
+
+**Known pipeline bugs to fix when porting**
+- Standard `![alt](x.png)` images are processed but their paths are never rewritten.
+- Output collisions on file stem (`a/foo.png` and `b/foo.jpg` both become `foo.avif`).
+- `_` triggers italic inside snake_case.
+- RSS is sorted by date *string*.
+- The `.env` parser truncates values containing `=` or `#`.
+- Search slices a UTF-8 string off a char boundary and panics, which is the likely "freeze" in diobsidian's `todo.md`.
+- Pruning deletes tracked demo assets.
+- Changing processing params doesn't invalidate cached outputs.
+
+---
+
+## 3. Architecture
+
+**Static HTML generator in Rust (`gen/`). No client framework.**
+
+```
+vault/ (Obsidian) ──► gen build ──► dist/  (GitHub Pages)
+  profile.md            vault.rs      frontmatter (serde_yaml) + body
+  projects/*.md         markdown.rs   wikilinks / ![[embeds]] → pulldown-cmark
+  skills/*.md           theme.rs      themes.toml → CSS custom props (surfaces derived)
+  assets/**             assets.rs     image pipeline: AVIF 1x/2x + JPEG/PNG fallback, masks, dither, ASCII
+                                      → .cache/img (hash-keyed) → dist/a/
+public/ ──(verbatim)──► page.rs       templates; inline CSS + init script; deferred site.<hash>.js
+                       report.rs     gen report → perf/<date>-<rev>.md
+```
+
+**Commands** (repo root):
+
+| Command | What it does |
+|---|---|
+| `just build` | Builds `vault/` into `dist/` |
+| `just build-drafts` | Also builds projects/skills marked `draft: true` |
+| `just serve` | Serves `dist/` at `http://localhost:8000` |
+| `just report` | Size and budget report, saved to `perf/` |
+| `just lighthouse /path/` | Lighthouse run against `just serve`; the JSON lands in `perf/lighthouse/` (gitignored) |
+
+### Output
+
+| Path | Contents |
+|---|---|
+| `/index.html` | Home |
+| `/project/<Title-With-Dashes>/` | One page per project. Same URL scheme as the Flutter site, so old links still work. |
+| `/404.html` | Not-found page |
+| `/no-data.html` | Privacy notice, passed through unchanged |
+| `/a/*` | Hashed assets |
+
+### Page anatomy
+
+Each page ships:
+- complete prerendered HTML
+- all CSS inline (~12KB raw, which includes the scheme variables)
+- a ~300B inline `<head>` script that applies the stored mode and scheme before first paint, so there's no flash
+- one deferred `site.<hash>.js`
+
+### Behaviours that need no JS
+
+- **About card:** `<details>`.
+- **Visited links:** purple via native `a:visited`, including the icon tile.
+- **Project icons:** recoloured via CSS `mask`.
+- **Mode and scheme labels:** switched by CSS from `data-*` attributes.
+- **Scheme picker:** the native `popover` attribute.
+
+### JS (`gen/static/site.js`)
+
+- Mode / scheme / follower toggles, persisted to `localStorage`. Keys: `mode`, `scheme`, `follower`.
+- Refreshes the version string and skill years at load. The HTML holds build-time values as the fallback.
+
+### Image pipeline (`gen/src/assets.rs`)
+
+- **Naming:** output files are named by `hash(source bytes + operation + PIPELINE_VERSION)`. Pages render first; `finish()` then encodes the missing variants in parallel (one decode per source) into `.cache/img/` (gitignored) and copies them to `dist/a/`.
+- **Build times:** cold 2.7s for 78 variants; warm 8ms.
+- **Re-encoding:** bump `PIPELINE_VERSION` to re-encode everything, or `ASCII_VERSION` for ASCII art only.
+
+| Use | Fit | Output |
+|---|---|---|
+| Gallery (`gallery:` frontmatter) | 600px tall | AVIF 1x q70 + 2x q56, JPEG/PNG fallback in `<picture>`. First image gets `fetchpriority=high`, images from the third on load lazily. |
+| Avatar | 40px square crop | Same as gallery |
+| Project icons | 32px PNG | Used as CSS `mask` |
+| Inline `![[x]]` / `![](x)` | Within 880×720 | Same as gallery, lazy |
+| Strip (consecutive images) | 320px tall | Same as gallery, lazy |
+| `--dither [--4\|--8\|--16]` | ≤600px wide | Floyd–Steinberg. Palette PNG at minimal bit depth. Baked navy→cream duotone. |
+| `--dither … --accent` | ≤600px wide | Grey palette tinted by the scheme primary via CSS `mix-blend-mode: multiply` |
+| `--ascii` | 120 cols | 8 glyphs after a 2nd–98th percentile contrast stretch. Dark and light variants switch by CSS. Font scales with `100cqi / cols / .6`, no JS. |
+
+- **Transparency:** real alpha is detected (not just an RGBA container). Opaque sources get JPEG fallbacks and RGB AVIF.
+- **Orientation:** EXIF orientation is applied.
+- **Formats:** WebP, GIF, PNG and JPEG sources are accepted. `dagger.png` is actually a WebP.
+- **Fixed from diobsidian:**
+  - standard `![]()` paths are now rewritten
+  - output names can't collide (the hash is in the name)
+  - changing params invalidates the cache (params are in the key)
+
+### Vault content model
+
+- **`profile.md`**
+  - Frontmatter: `name`, `handle`, `birth_date`, `avatar`, `email`, `links[]`.
+  - Body: the about text.
+- **`projects/<Title>.md`**
+  - Frontmatter: `title`, `description`, `order`, `draft`, `url`, `icon`, `start`, `end`, `platforms[]` (ios/android/web/ipad/macos), `technologies[{name,url}]`, `gallery[]` (file names).
+  - Body: markdown.
+- **`skills/<Name>.md`**
+  - Frontmatter: `name`, `order`, `draft`, `start`, `end`, `sub_skills[]`.
+  - Body: markdown, not rendered in the Flutter layout.
+- **Links and embeds:**
+  - `[[Project]]` and `[[Project|text]]` link to project pages.
+  - `![[file]]` and `![[file|caption]]` embed images; consecutive embeds become a scrolling strip.
+  - `![[art.txt]]` embeds ASCII art.
+  - Assets are resolved by file name anywhere in the vault, as Obsidian does.
+
+### Themes
+
+- `gen/themes.toml` holds the curated list (first entry = default). Current picks: Midnight, Blue whale, Espresso and crema, Green forest, Rosewood, Shark and orange, Material 3 purple, Mosque cyan. Swap freely: all 55 originals are listed in Appendix A.
+- Scaffold, card, divider, disabled and on-primary colours are derived in `theme.rs`, approximating FlexColorScheme `levelSurfacesLowScaffold`: blends of 3.5/7% (light) and 6.5/13% (dark).
+- **Verify against the live site** and tune the blend constants if they look off.
+
+### Deliberate deviations from Flutter
+
+- "Noteable" is fixed to "Notable".
+- The scheme persists between visits; Flutter reset it to Midnight on every load.
+- Entrance animations start immediately and finish within 600ms. Flutter waited 600ms first.
+- The broken profile link (BFS → Eqalink) is fixed.
+- Yutori and Acro-yoga from the Dioxus `work.json` are migrated as `draft: true`.
+
+---
+
+## 4. Decisions
+
+| # | Decision | Status |
+|---|---|---|
+| 1 | Layout | **Flutter layout**: 500px home column, 900px project page, tilde gutter, IDE footer |
+| 2 | Themes | **Curated shortlist**; scheme and mode **persist between visits** |
+| 3 | Font | **System UI stack**; no web-font request |
+| 4 | Generator home | **New crate in this repo**: `gen/` |
+| 5 | Privacy | **`/no-data.html` unchanged**: same URL, same content (store listings point at it) |
+| 6 | Deploy | *Open*: GitHub Actions → Pages (recommended), plus removing the Flutter artifacts from `master`. Custom domain? |
+| 7 | Extra content (Yutori, Acro-yoga) | *Open*: currently drafts. Flip `draft: false` to publish. |
+
+---
+
+## 5. Plan (phases)
+
+- [x] **P0 Discovery:** inventory, baseline.
+- [x] **P1 Decisions:** layout, themes, font and generator location locked. Vault content model defined and content migrated from `work.json` plus the Flutter profile text.
+- [x] **P2 Generator skeleton:**
+  - vault → HTML for home, projects and 404
+  - inline CSS, theme bootstrap, footer, scheme popover, mode toggle
+  - size report
+- [x] **P3 Image pipeline** (done 2026-10-05; see §3 "Image pipeline"). Original plan:
+  - **AVIF:**
+    - Port diobsidian's AVIF encoding. Install `nasm` for a fast rav1e build.
+    - Responsive sizes (`srcset`): gallery images at ~600px height ×1/×2, avatar 40px ×2, icons 20px ×2.
+  - **ASCII + dither flags:** `--ASCII` and `--dither [--4|--8|--16] [--accent]` on embeds.
+  - **Cache:** keyed by hash(source bytes + params) under `.cache/`.
+  - **Known diobsidian bugs to fix in the port:**
+    - standard `![](x)` image paths are never rewritten
+    - output names collide on file stem
+    - changing params doesn't invalidate cached outputs
+- [ ] **P4 Look & feel:**
+  - Cursor follower: rAF lerp; CSS `filter: blur` on the blobs; off for `pointer: coarse` and reduced motion.
+  - Cmd+P palette: search, and ↑/↓ to cycle schemes.
+  - Gallery lightbox with `<dialog>`; each gallery link already points at the 2x AVIF.
+  - Code blocks: build-time syntax highlighting and a copy button.
+  - Fix a11y: colour contrast (#007AFF on dark), heading order on project pages.
+- [ ] **P5 Perf hardening:**
+  - Check light-mode surfaces against the live site.
+  - Preload the LCP image.
+  - CI budget check that fails `gen report` when over budget.
+  - Lighthouse on every page.
+- [ ] **P6 Deploy:**
+  - Actions → Pages.
+  - Remove the Flutter build artifacts and sources from `master`: `lib/`, `canvaskit/`, `assets/`, `images/`, `main.dart.js`, platform folders, `portfolio_data/`, `compress_images/`.
+  - Delete the gitignored `rust-port/target` and `image_manager/target` directories locally (~4.3G).
+  - Keep `no-data.html` reachable at the same URL throughout.
+
+---
+
+## 6. Perf reports
+
+`just report` writes per-page detail to `perf/`. Summary:
+
+| Date | Build | Route | HTML (br) | Blocking | JS | First-view bytes | Lighthouse mobile (perf / LCP) | Notes |
+|---|---|---|---|---|---|---|---|---|
+| 2026-10-05 | Flutter `0bba8e6` (live) | `/` | 0.9KB | — | 1.29MB + 2.0–2.7MB wasm | ~3.3MB+ | not run | Baseline. Canvas render, gstatic CanvasKit, Google Fonts. |
+| 2026-03-28 | dioxus-rust-port (local) | `/` | 4.9KB | — | 10.5KB + 262KB wasm | ~280KB | — | Client-rendered. |
+| 2026-10-05 | gen P2 | `/` | 5.2KB | 0 | 1.5KB | 250KB | **100 / 1.1s** | The LCP element is the avatar (128KB JPEG at 40px). P3 brings it to ~3KB. |
+| 2026-10-05 | gen P2 | `/project/Eqalink/` | 5.4KB | 0 | 1.5KB | 5.9MB (14MB lazy) | 75 / 67s | Raw PNG screenshots, 1.6–3.2MB each. Needs P3. |
+| 2026-10-05 | gen P3 | `/` | 5.5KB | 0 | 1.5KB | 14KB | **100 / 1.1s** | Avatar is now a 1.2KB AVIF. 32KB total. |
+| 2026-10-05 | gen P3 | `/project/Eqalink/` | 5.7KB | 0 | 1.5KB | 60KB (192KB lazy) | **100 / 1.7s** | 232KB total, down from 18MB |
+| 2026-10-05 | gen P3 | `/project/Rock-Climber-Guide/` | 5.8KB | 0 | 1.5KB | 70KB (150KB lazy) | **100 / 1.7s** | |
+| 2026-10-05 | gen P3 | `/project/Better-Fantasy-System/` | 5.6KB | 0 | 1.5KB | 83KB (95KB lazy) | **100 / 1.5s** | |
+| 2026-10-05 | gen P3 | `/project/Pakmo/` | 5.1KB | 0 | 1.5KB | 33KB | **100 / 1.2s** | |
+
+Lighthouse notes:
+- **The LCP number is mostly simulation.** Observed LCP locally is 32–38ms on every page. Lighthouse picks the `~` gutter text as the LCP element, because the gallery fades in from `opacity:0` and Chrome excludes it. The simulated LCP (1.5–1.7s on slow 4G) then charges the high-priority 2x screenshots that download alongside it. If the screenshots should count as the LCP, drop the `b2` fade on `.gallery`.
+- The local `http.server` has no compression or cache headers, so ignore the text-compression and cache-TTL audits. GitHub Pages serves gzip with `max-age=600`.
+- Open a11y items: colour contrast, and heading order on project pages.
+
+---
+
+## 7. Progress log
+
+- **2026-10-05**
+  - Discovery done; `CONTEXT.md` created; baseline measured.
+- **2026-10-05**
+  - **Decisions:** Flutter layout, curated persistent themes, system font, `gen/` crate. Privacy page stays exactly as-is.
+  - **Vault:** migrated `vault/` (profile, 6 projects with 1 draft, 8 skills with 1 draft, 29 source images).
+  - **Generator (`gen/`):** built with `just build/serve/report/lighthouse`. 7 pages in 68ms.
+  - **Results:**
+    - Home scores Lighthouse Performance 100.
+    - HTML is ~5KB brotli per page; no render-blocking requests.
+  - **Next:** P3 images.
+- **2026-10-05 (P3)**
+  - **Pipeline:** installed `nasm`. Built the image pipeline in `gen/src/assets.rs`: AVIF 1x/2x with fallbacks, icon masks, indexed-PNG dither, ASCII with light/dark variants, a hash-keyed cache and parallel encoding.
+  - **Syntax:** the markdown preprocessor handles `--ascii/--dither/--4/--8/--16/--accent`, standard `![]()` images and strips. Verified on a scratch vault; unknown flags and missing files warn instead of failing.
+  - **Sizes:** `dist/` went from 28MB to 2MB.
+  - **Lighthouse:** Performance 100 on all 5 pages tested.
+  - **Report fix:** `gen report` now counts the largest AVIF candidate in `<picture>` rather than the fallback.
+  - **Next:** P4 look & feel.
+
+---
+
+## Appendix A: Theme schemes (light P/S/T | dark P/S/T)
+
+Order matches the Flutter picker.
+
+- **Midnight** (default): #00296B/#D26900/#5C5C95 | #B1CFF5/#FFD270/#C9CBFC
+  - Light containers: primaryContainer #A0C2ED, secondaryContainer #FFD270, tertiaryContainer #C8DBF8.
+  - Dark containers: primaryContainer #3873BA, secondaryContainer #D26900, tertiaryContainer #535393.
+- **Greens:** primary #065808 (light) / #629F80 (dark); the rest are computed.
+- **Red & Blue:** #1145A4/#B61D1D; dark is `toDark(30)`.
+- **Built-ins** (FlexColorScheme 7.3.1, `flex_color.dart:4866-4918`): Material, Material HC, Blue delight, Indigo nights, Hippie blue, Aqua blue, Brand blues, Deep blue sea, Pink sakura, Oh Mandy red, Red tornado, Red red wine, Purple brown, Green forest, Green money, Green jungle, Grey law, Willow and wasabi, Gold sunset, Mango mojito, Amber blue, Vesuvius burned, Deep purple, Ebony clay, Barossa, Shark and orange, Big stone tulip, Damask and lunar, Bahama and trinidad, Mallard and valencia, Espresso and crema, Outer space stage, Blue whale, San Juan blue, Rosewood, Blumine, Flutter Dash, M3 purple, Verdun green, Dell genoa green, Thunderbird red, Lipstick pink, Eggplant purple, Indigo San Marino, Endeavour blue, Mosque cyan, Blue stone teal, Camarone green, Verdun lime, Yukon gold yellow, Brown orange, Rust deep orange.
+- Generate `themes.css` straight from `~/.pub-cache/hosted/pub.dev/flex_color_scheme-7.3.1/lib/src/flex_color.dart` rather than hand-copying.
+
+## Appendix B: Key file references
+
+**Flutter**
+- `lib/src/home/bloc/home_bloc.dart:72-788`: content
+- `lib/src/projects/projects_page.dart`: home layout and animation
+- `lib/src/project/project_page.dart`: project layout
+- `lib/src/core/widgets/page_footer.dart`: footer
+- `lib/src/core/widgets/page_settings_wrapper.dart`: palette
+- `~/.pub-cache/hosted/pub.dev/vox_widgets-0.1.31/lib/src/widgets/vox_mouse_follower.dart`: cursor follower
+
+**Dioxus port** (branch `dioxus-rust-port`)
+- `rust-port/assets/work.json`
+- `rust-port/src/views/markdown.rs`
+- `rust-port/src/components/ascii_image.rs`
+- `rust-port/src/accent.rs`
+- `rust-port/index.html`: no-flash theme script
+
+**diobsidian**
+- `frontend/build.rs`:
+  - images: 1157-1541
+  - wikilinks: 1654-1744
+  - slugs: 22-87
+  - env: 2154-2201
+- `frontend/src/components/markdown.rs`
+- `frontend/src/components/latex.rs`
+- `.github/workflows/deploy.yml`
