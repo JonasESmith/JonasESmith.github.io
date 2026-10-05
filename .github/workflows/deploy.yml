@@ -1,10 +1,17 @@
-name: deploy
+name: build & deploy
 
-# Build vault/ -> dist/, enforce size budgets, publish to GitHub Pages.
+# Every push / PR: build vault/ -> dist/ and enforce size budgets.
+# Pushes to master (and manual runs) also publish to GitHub Pages.
 # Requires Settings → Pages → Source: "GitHub Actions".
+#
+# Speed (same idea as horro_campaign's cached dx binary):
+# - the compiled `gen` binary is cached, keyed on the generator's sources. Content-only pushes
+#   (vault edits) restore it and skip the Rust toolchain, nasm and the ~100s compile.
+# - encoded images are cached in .cache/img (content-addressed), so only new or changed images encode.
+# - a newer push to the same ref cancels the older run.
 on:
   push:
-    branches: [master]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -13,8 +20,11 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DEPLOY: ${{ github.ref == 'refs/heads/master' && github.event_name != 'pull_request' }}
 
 jobs:
   build:
@@ -22,33 +32,58 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Restore generator binary
+        id: gen-bin
+        uses: actions/cache@v4
+        with:
+          path: bin/gen
+          key: gen-${{ runner.os }}-${{ hashFiles('gen/src/**', 'gen/static/**', 'gen/themes.toml', 'gen/Cargo.toml', 'gen/Cargo.lock') }}
+
+      # ---- only when the generator changed ----
       - name: Install nasm (rav1e AVIF encoder asm)
+        if: steps.gen-bin.outputs.cache-hit != 'true'
         run: sudo apt-get update && sudo apt-get install -y nasm
 
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust
+        if: steps.gen-bin.outputs.cache-hit != 'true'
+        uses: dtolnay/rust-toolchain@stable
 
-      - uses: Swatinem/rust-cache@v2
+      - name: Rust dependency cache
+        if: steps.gen-bin.outputs.cache-hit != 'true'
+        uses: Swatinem/rust-cache@v2
         with:
           workspaces: gen
+          cache-on-failure: true
 
-      - uses: actions/cache@v4
+      - name: Compile generator
+        if: steps.gen-bin.outputs.cache-hit != 'true'
+        run: |
+          cargo build --release --manifest-path gen/Cargo.toml
+          mkdir -p bin && cp gen/target/release/gen bin/gen
+      # -----------------------------------------
+
+      - name: Image cache
+        uses: actions/cache@v4
         with:
           path: .cache/img
           key: img-${{ hashFiles('gen/src/assets.rs') }}-${{ hashFiles('vault/**') }}
           restore-keys: img-${{ hashFiles('gen/src/assets.rs') }}-
 
-      - name: Build
-        run: cargo run --release --manifest-path gen/Cargo.toml -- build
+      - name: Build site
+        run: bin/gen build
 
       - name: Size budget
-        run: cargo run --release --manifest-path gen/Cargo.toml -- report --check >> "$GITHUB_STEP_SUMMARY"
+        run: bin/gen report --check >> "$GITHUB_STEP_SUMMARY"
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload Pages artifact
+        if: env.DEPLOY == 'true'
+        uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
     needs: build
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
