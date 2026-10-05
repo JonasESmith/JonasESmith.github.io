@@ -1,11 +1,20 @@
-name: ci
+name: deploy
 
-# Build the site from vault/ and enforce the size budgets (gen report --check).
-# master is covered by deploy.yml (same build + gate, then publish).
+# Build vault/ -> dist/, enforce size budgets, publish to GitHub Pages.
+# Requires Settings → Pages → Source: "GitHub Actions".
 on:
   push:
-    branches-ignore: [master]
-  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -22,7 +31,6 @@ jobs:
         with:
           workspaces: gen
 
-      # Encoded images are content-addressed; restoring the cache skips re-encoding unchanged ones.
       - uses: actions/cache@v4
         with:
           path: .cache/img
@@ -34,3 +42,17 @@ jobs:
 
       - name: Size budget
         run: cargo run --release --manifest-path gen/Cargo.toml -- report --check >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

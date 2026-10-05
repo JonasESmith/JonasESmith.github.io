@@ -1,39 +1,39 @@
 # Portfolio
 
-A basic portfolio site, using flutter and rust. Wanted this to feel take some inspiration from basic IDE's and add some nice custom theming, so built out the application to have many different themes the user can select from.
+Jonas E. Smith's portfolio — [jonasesmith.github.io](https://jonasesmith.github.io).
 
-## Technologies Used
+Content lives in an Obsidian vault (`vault/`). A small Rust generator (`gen/`) turns it into
+prerendered static HTML with build-time image processing (AVIF, dithering, ASCII art), so pages
+load with no framework and almost no JavaScript.
 
-- [Flutter](https://flutter.dev/): Mature front end framework
-- [Rust](https://www.rust-lang.org/): Type safe, and powerful
-- [Quicktype](https://quicktype.io/): Allows for conversion of rust -> dart
+## Requirements
 
-## Getting started
+- [Rust](https://rustup.rs) (stable)
+- [just](https://github.com/casey/just)
+- `nasm` (fast AVIF encoding): `brew install nasm`
+- Node.js, only for Lighthouse reports
 
-Clone repo
-
-```bash
-git clone https://github.com/JonasESmith/JonasESmith.github.io.git
-```
-
-get necessary packages
+## Usage
 
 ```bash
-cd JonasESmith.github.io && flutter pub get
+just build          # vault/ -> dist/
+just serve          # build + http://localhost:8000
+just check          # build + fail if any page is over its size budget
+just report         # size/budget report -> perf/
+just lighthouse-all # Lighthouse on every page -> perf/
 ```
 
-build for...
+Push to `master` to deploy (GitHub Actions → Pages).
 
-```bash
-flutter run -d chrome
-flutter run -d macos
-flutter run ... other devices
+## Writing content
 
-```
+- `vault/profile.md`, `vault/projects/*.md`, `vault/skills/*.md` — YAML frontmatter + markdown.
+- Link projects with `[[Project]]` or `[[Project|text]]`.
+- Images: `![[file.png]]` or `![caption](path/file.png)`; consecutive image lines form a strip.
+  Flags after an image: `--dither [--4|--8|--16] [--accent]`, `--ascii`.
+- `draft: true` hides a page (`just build-drafts` to preview).
 
-> making changes to app_data.rs inside of `portfolio_data/`
+See [CONTEXT.md](CONTEXT.md) for architecture, decisions, perf history and progress.
 
-```bash
-cd portfolio_data
-cargo run
-```
+`public/` is copied verbatim — `public/no-data.html` is the privacy policy linked from the app
+store listings; keep its URL and content unchanged.
