@@ -1,7 +1,7 @@
 //! portfolio-gen: Obsidian vault -> prerendered static portfolio.
 //!
 //! gen build  [--vault vault] [--public public] [--out dist] [--cache .cache/img] [--drafts]
-//! gen report [--out dist] [--save perf]
+//! gen report [--out dist] [--save perf] [--check]   (--check: CI gate, exit 1 when over budget, no file written)
 
 mod assets;
 mod highlight;
@@ -32,7 +32,7 @@ fn main() -> Result<()> {
             &flag("--cache", ".cache/img"),
             args.iter().any(|a| a == "--drafts"),
         ),
-        "report" => report::run(&out, &flag("--save", "perf")),
+        "report" => report::run(&out, &flag("--save", "perf"), args.iter().any(|a| a == "--check")),
         _ => {
             eprintln!("usage: gen [build|report] [--vault DIR] [--public DIR] [--out DIR] [--cache DIR] [--drafts]");
             std::process::exit(2)

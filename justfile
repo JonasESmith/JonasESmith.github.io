@@ -16,6 +16,14 @@ serve: build
 report: build
 	{{gen}} report
 
+# CI gate: build and fail if any page is over budget
+check: build
+	{{gen}} report --check
+
+# Lighthouse every page (own server, retries) and write perf/lighthouse-<date>-<rev>.md
+lighthouse-all: build
+	scripts/lighthouse.py
+
 # Lighthouse (mobile, simulated slow 4G) against a running `just serve`. Usage: just lighthouse /project/Eqalink/
 lighthouse path="/":
 	mkdir -p perf/lighthouse

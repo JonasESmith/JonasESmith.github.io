@@ -339,8 +339,10 @@ const CHEVRON_BACK: &str = "<path d=\"m15 18-6-6 6-6\"/>";
 const CHEVRON_FWD: &str = "<path d=\"m9 18 6-6-6-6\"/>";
 const CHEVRON_UP: &str = "<path d=\"m18 15-6-6-6 6\"/>";
 const CHEVRON_UP_SQUARE: &str = "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"4\"/><path d=\"m8 14 4-4 4 4\"/>";
-const KEYBOARD_CHEVRON: &str = "<path d=\"m4 10 8 4 8-4\"/>";
-const CHART_BAR: &str = "<path d=\"M3 3v18h18M8 17v-3M13 17V5M18 17V9\"/>";
+// CupertinoIcons.keyboard_chevron_compact_down: keyboard over a small chevron
+const KEYBOARD_CHEVRON: &str = "<rect x=\"2\" y=\"3\" width=\"20\" height=\"12\" rx=\"2\"/><path d=\"M6 7h.01M10 7h.01M14 7h.01M18 7h.01M7 11h10M9 19l3 2 3-2\"/>";
+// CupertinoIcons.chart_bar_alt_fill: filled bars
+const CHART_BAR: &str = "<path d=\"M5 20V12M10 20V5M15 20V9M20 20v-5\" stroke-width=\"3.5\" stroke-linecap=\"butt\"/>";
 const LINK: &str = "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/>";
 const MOON: &str = "<path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/>";
 const SUN: &str = "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4\"/>";

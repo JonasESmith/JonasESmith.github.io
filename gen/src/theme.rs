@@ -1,8 +1,9 @@
 //! Colour schemes -> CSS custom properties.
 //!
-//! Each scheme provides primary/secondary/tertiary for light and dark. The rest approximates the
-//! Flutter site's FlexColorScheme M3 setup (`levelSurfacesLowScaffold`, blend 7 light / 13 dark):
-//! surfaces are tinted with primary, dividers/disabled are on-surface at M3 opacities.
+//! Each scheme provides primary/secondary/tertiary for light and dark. Everything else is derived with
+//! constants fitted to pixels sampled from the live Flutter site (Midnight, 2026-10-05; see CONTEXT.md):
+//!   scaffold #141516 / #fcfcfd, divider #383a3c / #d2d4d7, footer bar #161717 / #fbfbfc,
+//!   footer buttons (secondaryHeaderColor) #465262 / #ccd4e1.
 
 use anyhow::{Context, Result};
 use serde::Deserialize;
@@ -87,15 +88,18 @@ fn vars(c: &[String; 3], dark: bool) -> Result<String> {
     } else {
         (Rgb(255.0, 255.0, 255.0), Rgb(28.0, 27.0, 31.0))
     };
-    let (scaffold_blend, surface_blend) = if dark { (0.065, 0.13) } else { (0.035, 0.07) };
-    let bg = base.mix(p, scaffold_blend);
-    let card = base.mix(p, surface_blend);
+    let bg = base.mix(p, 0.014);
+    // Card/surface: near-neutral; the footer bar is this at 30% over the scaffold.
+    let card = if dark { Rgb(27.0, 27.0, 27.0).mix(p, 0.02) } else { Rgb(250.0, 250.0, 250.0).mix(p, 0.012) };
+    // Footer buttons (Flutter `secondaryHeaderColor`): a primary-tinted chip.
+    let hdr = if dark { base.mix(p, 0.34) } else { base.mix(p, 0.2) };
     let black = Rgb(0.0, 0.0, 0.0);
     let white = Rgb(255.0, 255.0, 255.0);
     // Text on primary: whichever of black/white contrasts more. Icon tint keeps Flutter's literal 0.5 rule.
     let on_p = if p.luminance() > 0.179 { black } else { white };
     let p_light = p.luminance() > 0.5;
     // Footer bar: card @ 30% over the scaffold, flattened so content scrolling underneath can't show through.
+    // (Opaque on purpose: the bar is sticky over content.)
     let bar = bg.mix(card, 0.3);
     // Text-safe variants: Flutter used iOS #007AFF / #AF52DE links and raw primary for link-ish text,
     // which fail AA on several surfaces. Nudge toward black (light) / white (dark) only as far as needed.
@@ -106,7 +110,7 @@ fn vars(c: &[String; 3], dark: bool) -> Result<String> {
     let link_v = Rgb(175.0, 82.0, 222.0).legible_on(&surfaces, toward);
     let p_text = p.legible_on(&[bg, bg.mix(p, 0.1)], toward);
     Ok(format!(
-        "--p:{};--s:{};--t:{};--bg:{};--card:{};--bar:{};--fg:{};--div:{};--dis:{};--muted:{};--on-p:{};--icon-fg:{};\
+        "--p:{};--s:{};--t:{};--bg:{};--card:{};--bar:{};--hdr:{};--fg:{};--div:{};--dis:{};--muted:{};--on-p:{};--icon-fg:{};\
          --link:{};--link-v:{};--p-text:{}",
         p.hex(),
         s.hex(),
@@ -114,8 +118,9 @@ fn vars(c: &[String; 3], dark: bool) -> Result<String> {
         bg.hex(),
         card.hex(),
         bar.hex(),
+        hdr.hex(),
         on.hex(),
-        bg.mix(on, 0.12).hex(),
+        bg.mix(on, 0.185).hex(),
         bg.mix(on, 0.38).hex(),
         bg.mix(on, 0.72).hex(),
         on_p.hex(),

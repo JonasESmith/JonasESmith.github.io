@@ -99,7 +99,7 @@
   // Runs only while catching up; idle pages do no work. Touch / reduced-motion keep the static glow.
   if (matchMedia("(pointer:fine)").matches && !reduced) {
     const g1 = $(".g1"), g2 = $(".g2");
-    let tx = innerWidth / 2, ty = innerHeight * 0.4, raf = 0, last = 0;
+    let tx = 0, ty = 0, raf = 0, last = 0;
     const p1 = [tx, ty], p2 = [tx, ty];
     const tick = t => {
       const dt = Math.min(64, last ? t - last : 16); last = t;

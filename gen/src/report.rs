@@ -35,7 +35,8 @@ fn wire(path: &Path, bytes: &[u8]) -> Result<usize> {
     Ok(if matches!(ext, "html" | "js" | "css" | "svg" | "txt" | "json") { sizes(bytes)?.gz } else { bytes.len() })
 }
 
-pub fn run(out: &Path, save_dir: &Path) -> Result<()> {
+/// `check`: fail (non-zero exit) when any budget is exceeded, for CI.
+pub fn run(out: &Path, save_dir: &Path, check: bool) -> Result<()> {
     anyhow::ensure!(out.is_dir(), "{} not built — run `gen build` first", out.display());
     let rev = git(&["rev-parse", "--short", "HEAD"]).unwrap_or_else(|| "nogit".into());
     let dirty = git(&["status", "--porcelain"]).is_some_and(|s| !s.is_empty());
@@ -117,10 +118,13 @@ pub fn run(out: &Path, save_dir: &Path) -> Result<()> {
     }
 
     print!("{md}");
-    fs::create_dir_all(save_dir)?;
-    let file = save_dir.join(format!("{date}-{rev}.md"));
-    fs::write(&file, &md)?;
-    eprintln!("saved {}", file.display());
+    if !check {
+        fs::create_dir_all(save_dir)?;
+        let file = save_dir.join(format!("{date}-{rev}.md"));
+        fs::write(&file, &md)?;
+        eprintln!("saved {}", file.display());
+    }
+    anyhow::ensure!(!check || over.is_empty(), "{} budget violation(s)", over.len());
     Ok(())
 }
 

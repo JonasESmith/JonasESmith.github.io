@@ -194,6 +194,10 @@ public/ ──(verbatim)──► page.rs       templates; inline CSS + init scr
 | `just serve` | Serves `dist/` at `http://localhost:8000` |
 | `just report` | Size and budget report, saved to `perf/` |
 | `just lighthouse /path/` | Lighthouse run against `just serve`; the JSON lands in `perf/lighthouse/` (gitignored) |
+| `just check` | CI gate: build, then fail if any page is over budget (`gen report --check`) |
+| `just lighthouse-all` | Lighthouse on every page. Starts its own server, warms each URL, retries interstitials. Summary goes to `perf/lighthouse-<date>-<rev>.md`. |
+
+CI: `.github/workflows/ci.yml` runs build and `report --check` on every push and PR, and appends the size report to the job summary. Encoded images are cached between runs.
 
 ### Output
 
@@ -290,14 +294,18 @@ Each page ships:
 ### Themes
 
 - `gen/themes.toml` holds the curated list (first entry = default). Current picks: Midnight, Blue whale, Espresso and crema, Green forest, Rosewood, Shark and orange, Material 3 purple, Mosque cyan. Swap freely: all 55 originals are listed in Appendix A.
-- Scaffold, card, divider, disabled and on-primary colours are derived in `theme.rs`, approximating FlexColorScheme `levelSurfacesLowScaffold`: blends of 3.5/7% (light) and 6.5/13% (dark).
-- **Verify against the live site** and tune the blend constants if they look off.
+- Scaffold, card, footer-bar, footer-button, divider and on-primary colours are derived in `theme.rs` using constants **fitted to pixels sampled from the live Flutter site** (Midnight, 2026-10-05).
+  - Live: scaffold `#141516` / `#fcfcfd`, divider `#383a3c` / `#d2d4d7`, footer bar `#161717` / `#fbfbfc`, footer buttons `#465262` / `#ccd4e1`.
+  - Ours now matches within 1–3 levels per channel.
+  - The fit is: scaffold = base + 1.4% primary; divider = on-surface at 18.5%; footer buttons = primary at 34% (dark) / 20% (light).
+  - Other schemes use the same formulas, so they inherit the fit.
 
 ### Deliberate deviations from Flutter
 
 - "Noteable" is fixed to "Notable".
 - ↑/↓ cycle schemes only while the palette is open. Flutter cycled globally, but on the web that would hijack page scrolling.
 - The cursor glow uses gradients that fade to transparent rather than a full-screen 100σ backdrop blur, which is too expensive on mobile GPUs. The 5% noise layer is dropped: under Flutter's blur it was invisible.
+- Matching Flutter: the home column is vertically centred, the glow starts at the top-left corner (and stays there on touch), and footer buttons carry the `secondaryHeaderColor` chip background.
 - Link colours are slightly darker in light mode and lighter in dark mode than iOS #007AFF / #AF52DE, to pass WCAG AA.
 - The scheme persists between visits; Flutter reset it to Midnight on every load.
 - Entrance animations start immediately and finish within 600ms. Flutter waited 600ms first.
@@ -344,9 +352,9 @@ Each page ships:
   - Gallery lightbox with `<dialog>`; each gallery link already points at the 2x AVIF.
   - Code blocks: build-time syntax highlighting and a copy button.
   - Fix a11y: colour contrast (#007AFF on dark), heading order on project pages.
-- [ ] **P5 Perf hardening:**
+- [x] **P5 Perf hardening** (done 2026-10-05). Original plan:
   - Check light-mode surfaces against the live site.
-  - Preload the LCP image.
+  - Preload the LCP image. *Not needed:* the first screenshot is already in the initial HTML with `fetchpriority=high`, and observed LCP is 41–322ms locally.
   - CI budget check that fails `gen report` when over budget.
   - Lighthouse on every page.
 - [ ] **P6 Deploy:**
@@ -410,6 +418,15 @@ Lighthouse notes:
   - Lighthouse: 100 in every category on 4 pages.
   - Verified with a puppeteer-core script: glow tracking, palette filter, mode persistence, lightbox paging, code blocks in both modes, mobile layout. No console errors.
   - **Next:** P5 (compare surfaces against the live Flutter site, CI budget check), then P6 deploy.
+- **2026-10-05 (P5)**
+  - Committed P4 as `da0bee1`.
+  - Screenshotted the live Flutter site (puppeteer, both modes), sampled surface colours and fitted `theme.rs`. Fixed the layout differences found: vertical centring, glow origin, footer chip colour, keyboard and filled-bars icons.
+  - Added `gen report --check` (verified: exit 1 on an oversized page, 0 when clean), `just check`, the CI workflow, and `scripts/lighthouse.py` / `just lighthouse-all`.
+  - Lighthouse: 100 in all four categories on all 6 content pages (`perf/lighthouse-2026-10-05-*.md`).
+  - Remaining non-scored flags:
+    - `unused-css-rules` (one shared inline stylesheet).
+    - `uses-responsive-images`: the Lighthouse device is DPR 1.75, so 2x is slightly larger than needed. A 1.5x variant would shave ~15KB per page; not worth it yet.
+  - **Next:** P6 deploy. Measure real-network load on GitHub Pages afterwards, since the <400ms goal can only be confirmed there.
 
 ---
 
