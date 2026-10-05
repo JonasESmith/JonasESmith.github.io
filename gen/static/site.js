@@ -96,26 +96,41 @@
   });
 
   // --- Cursor follower: exponential lerp ≈ Flutter's 700ms / 1400ms easeOutCubic lag.
-  // Runs only while catching up; idle pages do no work. Touch / reduced-motion keep the static glow.
+  // Hidden until the first mouse move, then placed at the cursor and faded in (no sweep from a corner).
+  // The rAF loop runs only while catching up. Touch / reduced motion: fade in at rest, no tracking.
+  const glow = $(".glow");
+  const reveal = () => requestAnimationFrame(() => glow.classList.add("on"));
   if (matchMedia("(pointer:fine)").matches && !reduced) {
-    const g1 = $(".g1"), g2 = $(".g2");
-    let tx = 0, ty = 0, raf = 0, last = 0;
-    const p1 = [tx, ty], p2 = [tx, ty];
+    const g1 = $(".g1"), g2 = $(".g2"), grain = $(".gr>b");
+    let tx = 0, ty = 0, raf = 0, last = 0, started = false;
+    const p1 = [0, 0], p2 = [0, 0];
+    const place = () => {
+      g1.style.transform = `translate(${p1[0]}px,${p1[1]}px)`;
+      grain.style.transform = `translate(${-p1[0]}px,${-p1[1]}px)`;  // grain stays put; the glow moves over it
+      g2.style.transform = `translate(${p2[0]}px,${p2[1]}px)`;
+    };
     const tick = t => {
       const dt = Math.min(64, last ? t - last : 16); last = t;
       const k1 = 1 - Math.exp(-dt / 230), k2 = 1 - Math.exp(-dt / 460);
       p1[0] += (tx - p1[0]) * k1; p1[1] += (ty - p1[1]) * k1;
       p2[0] += (tx - p2[0]) * k2; p2[1] += (ty - p2[1]) * k2;
-      g1.style.transform = `translate(${p1[0]}px,${p1[1]}px)`;
-      g2.style.transform = `translate(${p2[0]}px,${p2[1]}px)`;
+      place();
       if (Math.abs(tx - p2[0]) + Math.abs(ty - p2[1]) > 0.5) raf = requestAnimationFrame(tick);
       else { raf = 0; last = 0 }
     };
     addEventListener("pointermove", e => {
       if (e.pointerType !== "mouse") return;
       tx = e.clientX; ty = e.clientY;
+      if (!started) {
+        started = true;
+        p1[0] = p2[0] = tx; p1[1] = p2[1] = ty;
+        place(); reveal();
+        return;
+      }
       if (!raf) raf = requestAnimationFrame(tick);
     }, { passive: true });
+  } else {
+    reveal();
   }
 
   // --- Build-time values go stale between deploys; refresh them.

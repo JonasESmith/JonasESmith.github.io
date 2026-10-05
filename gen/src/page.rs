@@ -108,7 +108,7 @@ fn shell(chrome: &Chrome, title: &str, desc: &str, main: &str) -> String {
     format!(
         "<!doctype html><html lang=\"en\" data-scheme=\"midnight\"><head><title>{}</title>\
          <meta name=\"description\" content=\"{}\">{}</head><body>\
-         <div class=\"glow\" aria-hidden=\"true\"><i class=\"g1\"></i><i class=\"g2\"><i></i></i></div>\
+         <div class=\"glow\" aria-hidden=\"true\"><i class=\"g1\"><i></i><b class=\"gr\"><b></b></b></i><i class=\"g2\"><i></i></i></div>\
          <div class=\"app\"><pre class=\"gutter\" aria-hidden=\"true\">{gutter}</pre><main>{main}</main></div>{}</body></html>",
         esc(title),
         esc(desc),

@@ -229,10 +229,14 @@ Each page ships:
 
 - **Toggles:** mode, scheme and follower, persisted to `localStorage` (keys `mode`, `scheme`, `follower`).
 - **Palette:** Cmd/Ctrl+P toggles it, which also blocks the print dialog the way `prevent_default.js` did. Case-insensitive search; ↑/↓ cycle schemes and Enter closes. Opening it focuses the search field on pointer devices.
-- **Cursor follower:** two radial-gradient glows (secondary 12% → primary 6% → tertiary 3% → transparent). An exponential lerp approximates Flutter's 700ms / 1400ms easeOutCubic lag. The small glow orbits the cursor at 100px via a CSS animation. The rAF loop runs only while catching up.
-  - Touch devices: a static ambient glow.
-  - `prefers-reduced-motion`: static.
-  - "Mouse Shadow" in the footer hides it.
+- **Cursor follower** (retuned 2026-10-05 at the owner's request: subtler, tapered, blurred, grainy):
+  - **Glows:** two radial gradients with a tapered falloff (secondary 7% → 6% → primary 3.8% → 2% → tertiary 0.7% → transparent), about 40% fainter than Flutter's. The small 300px glow has a 24px blur and orbits the cursor at 100px via a CSS animation.
+  - **Grain:** an inline SVG `feTurbulence` noise, thresholded into alpha specks (black on light at 11%, white on dark at 12%), so it reads as film grain rather than a grey tint. About 0.9KB inline, no request.
+    - **The grain is anchored to the viewport.** A round mask travels with the big glow, and `site.js` counter-translates the grain plane inside it. The specks stay still and the glow sweeps across them, revealing different grain as the mouse moves. Both moves are compositor transforms, with no per-frame repaint.
+    - Verified: the plane stays at (0,0) before, during and after the glow moves.
+  - **Entrance:** invisible until the first mouse move, then placed at the cursor and faded in over 0.9s. No sweep in from a corner.
+  - **Motion:** an exponential lerp approximates Flutter's 700ms / 1400ms easeOutCubic lag. The rAF loop runs only while catching up.
+  - Touch devices and `prefers-reduced-motion`: fades in at rest (top-left) with no tracking. "Mouse Shadow" in the footer hides it.
 - **Lightbox:** a native `<dialog>` with backdrop blur. Back pill, "Image n / N" pager, ←/→ keys, swipe, and Esc or backdrop click to close. Without JS the gallery links open the 2x AVIF directly.
 - **Code blocks:** copy button with a check-mark confirmation for 2s.
 - **Dates:** refreshes the version string and skill years at load; the HTML holds build-time values as the fallback.
@@ -305,7 +309,8 @@ Each page ships:
 - "Noteable" is fixed to "Notable".
 - ↑/↓ cycle schemes only while the palette is open. Flutter cycled globally, but on the web that would hijack page scrolling.
 - The cursor glow uses gradients that fade to transparent rather than a full-screen 100σ backdrop blur, which is too expensive on mobile GPUs. The 5% noise layer is dropped: under Flutter's blur it was invisible.
-- Matching Flutter: the home column is vertically centred, the glow starts at the top-left corner (and stays there on touch), and footer buttons carry the `secondaryHeaderColor` chip background.
+- Matching Flutter: the home column is vertically centred, and footer buttons carry the `secondaryHeaderColor` chip background.
+- Glow, by owner request: subtler, tapered, blurred, with grain, and it fades in at the cursor on first move. Flutter's glow started in the top-left corner and swept to the cursor.
 - Link colours are slightly darker in light mode and lighter in dark mode than iOS #007AFF / #AF52DE, to pass WCAG AA.
 - The scheme persists between visits; Flutter reset it to Midnight on every load.
 - Entrance animations start immediately and finish within 600ms. Flutter waited 600ms first.
@@ -435,6 +440,7 @@ Lighthouse notes:
   - `public/home/` redirects the old `/home` route.
   - `/no-data.html` verified byte-identical to the live copy.
   - Pushed `rust-rewrite` (`367c5e8`); CI is green on GitHub.
+  - Follower retune (owner request): subtler tapered/blurred glows, film grain, fade-in at the cursor. Verified with puppeteer: opacity 0 before the first move, placed at the exact cursor position, faded to 1, no errors. Lighthouse still 100 on all categories.
   - **Switch-over order:**
     1. Pages Source → GitHub Actions. This is a repo setting and needs the owner, since `gh` isn't installed here. The old deployment keeps serving until a new one lands.
     2. Merge `rust-rewrite` into `master` and push.

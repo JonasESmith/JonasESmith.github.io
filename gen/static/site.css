@@ -166,16 +166,25 @@ a.pill-title{color:var(--p-text)}
 .b3{animation:fade .5s ease-out .2s both}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
-/* Cursor follower (VoxMouseFollower): two soft radial glows lerped toward the pointer by site.js.
-   Gradients fade to transparent instead of Flutter's 100σ backdrop blur, so moving costs one compositor transform. */
-.glow{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-/* Flutter starts the glow at (0,0) and, without hover (touch), it stays there */
+/* Cursor follower (VoxMouseFollower), toned down: two tapered radial glows lerped toward the pointer by site.js,
+   a soft blur on the small one, and film grain: SVG fractal noise thresholded into alpha specks (black on light,
+   white on dark) so it reads as texture, not a grey tint. The grain stays fixed to the viewport; the glow reveals it.
+   Hidden until the first pointer move, then fades in at the cursor. Moving costs one compositor transform. */
+.glow{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .9s ease-out}
+.glow.on{opacity:1}
 .g1,.g2{position:absolute;left:0;top:0;will-change:transform}
-.g1::before,.g2>i{content:"";position:absolute;display:block;border-radius:50%;
-  background:radial-gradient(closest-side,color-mix(in srgb,var(--s) 12%,transparent),color-mix(in srgb,var(--p) 6%,transparent) 50%,
-  color-mix(in srgb,var(--t) 3%,transparent) 80%,transparent)}
-.g1::before{width:1000px;height:1000px;left:-500px;top:-500px}
-.g2>i{width:300px;height:300px;left:-150px;top:-150px;animation:orbit 20s linear infinite}
+.g1>i,.g2>i{position:absolute;display:block;border-radius:50%;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--s) 7%,transparent),color-mix(in srgb,var(--s) 6%,transparent) 18%,
+  color-mix(in srgb,var(--p) 3.8%,transparent) 38%,color-mix(in srgb,var(--p) 2%,transparent) 58%,
+  color-mix(in srgb,var(--t) .7%,transparent) 78%,transparent)}
+.g1>i{width:1000px;height:1000px;left:-500px;top:-500px}
+.g2>i{width:300px;height:300px;left:-150px;top:-150px;filter:blur(24px);animation:orbit 20s linear infinite}
+/* Grain: a viewport-anchored plane seen through a round mask that travels with the big glow.
+   site.js counter-translates the plane, so the specks stay still and the glow sweeps across them. */
+.gr{position:absolute;width:900px;height:900px;left:-450px;top:-450px;-webkit-mask:radial-gradient(closest-side,#000,rgba(0,0,0,.45) 45%,transparent);mask:radial-gradient(closest-side,#000,rgba(0,0,0,.45) 45%,transparent)}
+.gr>b{position:absolute;left:450px;top:450px;width:100vw;height:100vh;will-change:transform;
+  background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='160'%20height='160'%3E%3Cfilter%20id='g'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%2011%200%200%200%20-6'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23g)'/%3E%3C/svg%3E") 0 0/160px;opacity:.11;}
+[data-mode=dark] .gr>b{background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='160'%20height='160'%3E%3Cfilter%20id='g'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20values='0%200%200%200%201%200%200%200%200%201%200%200%200%200%201%2011%200%200%200%20-6'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23g)'/%3E%3C/svg%3E");opacity:.12}
 @keyframes orbit{from{transform:rotate(0) translateX(100px)}to{transform:rotate(360deg) translateX(100px)}}
 [data-follower=off] .glow{display:none}
 
