@@ -383,7 +383,7 @@ Each page ships:
   - Preload the LCP image. *Not needed:* the first screenshot is already in the initial HTML with `fetchpriority=high`, and observed LCP is 41–322ms locally.
   - CI budget check that fails `gen report` when over budget.
   - Lighthouse on every page.
-- [ ] **P6 Deploy** (in progress). Original plan:
+- [x] **P6 Deploy** (live 2026-10-05, `master` @ `00c87ef`). Original plan:
   - Actions → Pages.
   - Remove the Flutter build artifacts and sources from `master`: `lib/`, `canvaskit/`, `assets/`, `images/`, `main.dart.js`, platform folders, `portfolio_data/`, `compress_images/`.
   - Delete the gitignored `rust-port/target` and `image_manager/target` directories locally (~4.3G).
@@ -410,6 +410,21 @@ Each page ships:
 | 2026-10-05 | gen P4 | `/project/Eqalink/` | 6.9KB | 0 | ≈2KB br | 63KB | **100 / 1.7s**; a11y, best practices and SEO 100 | |
 | 2026-10-05 | gen P4 | `/project/Portfolio/` | 6.4KB | 0 | ≈2KB br | 10KB | **100 / 1.1s**; a11y, best practices and SEO 100 | Highlighted code blocks |
 | 2026-10-05 | gen P4 | `/project/Rock-Climber-Guide/` | 6.9KB | 0 | ≈2KB br | 72KB | **100 / 1.7s**; a11y, best practices and SEO 100 | |
+| 2026-10-05 | **live** `00c87ef` | `/` | 8.4KB gz | 0 | 2.3KB gz | 20KB total | **100 / 0.8s**; all categories 100 | GitHub Pages with real gzip |
+| 2026-10-05 | **live** `00c87ef` | `/project/Eqalink/` | 8.7KB gz | 0 | 2.3KB gz | 211KB total | **100 / 1.2s**; all categories 100 | |
+
+**Real-network cold loads of the live site** (puppeteer, fresh context, cache disabled, mobile viewport, median of 5):
+
+| Network | Page | FCP | LCP | Load |
+|---|---|---|---|---|
+| Unthrottled | `/` | 112ms | 112ms | 111ms |
+| Unthrottled | `/project/Eqalink/` | 100ms | 100ms | 134ms |
+| Unthrottled | `/project/Rock-Climber-Guide/` | 116ms | 116ms | 168ms |
+| 4G (60ms RTT, 9Mbps) | `/` | 148ms | 148ms | 214ms |
+| 4G (60ms RTT, 9Mbps) | `/project/Eqalink/` | 132ms | 300ms | 281ms |
+| 4G (60ms RTT, 9Mbps) | `/project/Rock-Climber-Guide/` | 148ms | 312ms | 282ms |
+
+**The sub-400ms goal is met**, including LCP on the screenshot-heavy pages. For comparison, the Flutter site needed about 3.3MB before first paint.
 
 Lighthouse notes:
 - **The LCP number is mostly simulation.** Observed LCP locally is 32–38ms on every page. Lighthouse picks the `~` gutter text as the LCP element, because the gallery fades in from `opacity:0` and Chrome excludes it. The simulated LCP (1.5–1.7s on slow 4G) then charges the high-priority 2x screenshots that download alongside it. If the screenshots should count as the LCP, drop the `b2` fade on `.gallery`.
@@ -462,7 +477,22 @@ Lighthouse notes:
   - `/no-data.html` verified byte-identical to the live copy.
   - Pushed `rust-rewrite` (`367c5e8`); CI is green on GitHub.
   - Follower retune (owner request): subtler tapered/blurred glows, film grain, fade-in at the cursor. Verified with puppeteer: opacity 0 before the first move, placed at the exact cursor position, faded to 1, no errors. Lighthouse still 100 on all categories.
-  - **Switch-over order:**
+  - **2026-10-05, go-live:**
+    - The owner switched Pages to GitHub Actions and merged PR #4 (squash). The first deploy job was cancelled in GitHub's queue during an Actions incident; the build job had succeeded.
+    - At the owner's request, the Claude co-author trailers were removed from the squash commit and `master` was force-pushed: `eec18ca` → `00c87ef`, same tree. GitHub's contributors API lists only JonasESmith; the repo page's contributors widget refreshes on GitHub's cache schedule.
+    - The deploy for `00c87ef` succeeded: build 10s (cached generator), deploy 10s.
+    - Verified live:
+      - all 6 pages return 200 (about 8KB gz)
+      - slash-less URLs and `/home` redirect
+      - `/no-data.html` is byte-identical
+      - the service-worker kill switch is served
+      - the 404 page works
+    - Lighthouse on live: 100 in all categories. Real-network cold loads 100–312ms (table in §6).
+    - Follow-ups:
+      - Delete the merged `rust-rewrite` branch, which still holds the original commits with trailers.
+      - Delete local leftovers `rust-port/` and `image_manager/` (4.3G of build caches).
+      - Optionally: update `vault/projects/Portfolio.md` (it still describes the Flutter build), and connect `www.jonasesmith.com`.
+  - **Switch-over order (as planned):**
     1. Pages Source → GitHub Actions. This is a repo setting and needs the owner, since `gh` isn't installed here. The old deployment keeps serving until a new one lands.
     2. Merge `rust-rewrite` into `master` and push.
     3. `deploy.yml` publishes.
