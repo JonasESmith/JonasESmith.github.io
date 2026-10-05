@@ -1,0 +1,1 @@
+(function(h,s){try{s=localStorage}catch(e){s={}}h.dataset.mode=s.mode||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");if(/^(__SCHEMES__)$/.test(s.scheme))h.dataset.scheme=s.scheme;if(s.follower==="0")h.dataset.follower="off"})(document.documentElement)
