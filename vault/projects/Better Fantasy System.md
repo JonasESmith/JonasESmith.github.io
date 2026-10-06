@@ -1,7 +1,7 @@
 ---
 title: "Better Fantasy System"
 description: "A highly customizable table top simulator for players and GMs"
-order: 4
+order: 6
 draft: false
 icon: "dagger.png"
 start: "2023-06-01"

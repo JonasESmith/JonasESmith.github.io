@@ -289,7 +289,7 @@ Each page ships:
 | Strip (consecutive images) | 320px tall | Same as gallery, lazy |
 | `--dither [--4\|--8\|--16]` | ≤600px wide | Floyd–Steinberg. Palette PNG at minimal bit depth. Baked navy→cream duotone. |
 | `--dither … --accent` | ≤600px wide | Grey palette tinted by the scheme primary via CSS `mix-blend-mode: multiply` |
-| `--ascii` | 120 cols | 8 glyphs after a 2nd–98th percentile contrast stretch. Dark and light variants switch by CSS. Font scales with `100cqi / cols / .6`, no JS. |
+| `--ascii` | 120 cols, ≤640px wide | 8 glyphs after a 2nd–98th percentile contrast stretch. Rendered as **inline SVG text**: authored at 12px, scaled by the viewBox, each line pinned with `textLength`, so audits don't see "illegible text". One variant for both modes, in the text colour, so it's a bright figure on dark and a silhouette on light. Inverting glyph density for light mode, the diobsidian approach, made a solid slab. |
 
 - **Transparency:** real alpha is detected (not just an RGBA container). Opaque sources get JPEG fallbacks and RGB AVIF.
 - **Orientation:** EXIF orientation is applied.
@@ -307,11 +307,13 @@ Each page ships:
 - **`projects/<Title>.md`**
   - Frontmatter: `title`, `description`, `order`, `draft`, `url`, `icon`, `start`, `end`, `platforms[]` (ios/android/web/ipad/macos), `technologies[{name,url}]`, `gallery[]` (file names).
   - Body: markdown.
-- **`skills/<Name>.md`**
-  - Frontmatter: `name`, `order`, `draft`, `start`, `end`, `sub_skills[]`.
-  - Body: markdown, not rendered in the Flutter layout.
+- **`skills/<Name>.md`** (one page each at `/skill/<Name>/`, linked from the home skill rows)
+  - Frontmatter: `name`, `order`, `draft`, `start`, `end`, `sub_skills[]`. Each sub-skill is either `- Bloc` or `- { name: Bloc, note: State management }`.
+  - The page shows a span line ("since 2018 · 8.7 y"), a Toolbox list with the sub-skill notes, then the body. Galleries, ASCII art and dithering work in the body as in projects.
+  - The file name is free, since the display name comes from frontmatter. Avoid leading dots: `.Net.md` was hidden by Obsidian, so it's now `DotNet.md`.
 - **Links and embeds:**
-  - `[[Project]]` and `[[Project|text]]` link to project pages.
+  - `[[Name]]` and `[[Name|text]]` link to a project page, or failing that a skill page (case-insensitive).
+  - Obsidian callouts (`> [!NOTE]`, `> [!TIP] Custom title`) render as a labelled blockquote.
   - `![[file]]` and `![[file|caption]]` embed images; consecutive embeds become a scrolling strip.
   - `![[art.txt]]` embeds ASCII art.
   - Assets are resolved by file name anywhere in the vault, as Obsidian does.
@@ -336,7 +338,9 @@ Each page ships:
 - The scheme persists between visits; Flutter reset it to Midnight on every load.
 - Entrance animations start immediately and finish within 600ms. Flutter waited 600ms first.
 - The broken profile link (BFS → Eqalink) is fixed.
-- Yutori and Acro-yoga from the Dioxus `work.json` are migrated as `draft: true`.
+- Yutori and Acro-yoga from the Dioxus `work.json` were migrated as `draft: true`, then published on 2026-10-06 at the owner's request.
+- Skills are clickable and have their own pages; the Flutter skill rows were not links.
+- Projects without an `icon` show their first letter in the tile (Midwestern Interactive, Yutori).
 
 ---
 
@@ -350,7 +354,7 @@ Each page ships:
 | 4 | Generator home | **New crate in this repo**: `gen/` |
 | 5 | Privacy | **`/no-data.html` unchanged**: same URL, same content (store listings point at it) |
 | 6 | Deploy | **GitHub Actions → Pages** (`deploy.yml` on push to `master`), with the Flutter build removed from the repo. No custom domain for now: `www.jonasesmith.com` is a Namecheap parking page. To use it later, point DNS at Pages and add `public/CNAME`. |
-| 7 | Extra content (Yutori, Acro-yoga) | *Open*: currently drafts. Flip `draft: false` to publish. |
+| 7 | Extra content | **Published** (2026-10-06): Yutori, Acro-yoga, and Midwestern Interactive as the current role. Project order puts the newest first: MWI, Yutori, then the Flutter-era list. |
 
 ---
 
@@ -497,6 +501,20 @@ Lighthouse notes:
     2. Merge `rust-rewrite` into `master` and push.
     3. `deploy.yml` publishes.
     4. Verify live: pages, `/no-data.html` bytes, real-network timing.
+
+---
+
+- **2026-10-06 (content + skill pages)**
+  - Reviewed the notes on branch `dioxus-rust-port` (`About me/Work.md`, `Life.md`, `Skills/Drawing.md`, `work.json`) and brought them in:
+    - The about text was updated to the current role and 8 years.
+    - Midwestern Interactive was added; Yutori and Acro-yoga were published.
+    - Sub-skill notes were restored.
+    - The three portrait drawings were added (originals were AVIF, converted to PNG because the pipeline doesn't decode AVIF).
+    - ASCII art is generated from the source photos (`vault/assets/ascii/`).
+    - Writing was tightened, using only facts present in the notes.
+  - Generator changes: skill pages, wikilinks to skills, Obsidian callouts, letter tiles, ASCII as SVG text.
+  - Lighthouse: 100 in all four categories on all 16 content pages.
+  - The Lighthouse runner now skips redirect stubs and names `/` as `index` (`/` and `/home/` used to overwrite each other). `/home/` gained a favicon link, which removed a console 404.
 
 ---
 

@@ -80,6 +80,8 @@ a.lsb:visited{color:var(--link-v)}
 .ico{width:20px;height:20px;padding:2px;margin-right:8px;border-radius:4px;background-color:var(--link);display:grid}
 a.lsb:visited .ico{background-color:var(--link-v)}
 .ico::before{content:"";background:var(--icon-fg);-webkit-mask:var(--i) center/contain no-repeat;mask:var(--i) center/contain no-repeat}
+.ico[data-letter]{place-items:center;font-size:11px;font-weight:700;line-height:1;color:var(--icon-fg)}
+.ico[data-letter]::before{content:none}
 .yrs{font-size:12px;line-height:16px;color:var(--fg);padding:0 8px 0 8px;margin-right:8px}
 .nf{display:flex;align-items:center;gap:8px;padding:8px}
 
@@ -96,6 +98,11 @@ a.pill-title{color:var(--p-text)}
 .plat{display:flex;gap:8px;margin-right:8px}
 .plat .i{width:22px;height:22px}
 .lbl-s{font-size:12px;line-height:16px;margin:16px 0 8px}
+/* Skill pages */
+.span{font-size:12px;line-height:16px;color:var(--muted);margin-right:8px}
+.subs{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.subs li{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.sub-note{font-size:12px;line-height:16px;color:var(--muted)}
 .chips{display:flex;flex-wrap:wrap;gap:8px 4px}
 .chip{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:16px;border:1px solid var(--p);
   background:color-mix(in srgb,var(--p) 10%,transparent);color:var(--p-text);font-size:12px;line-height:16px;text-decoration:none}
@@ -121,6 +128,7 @@ a.pill-title{color:var(--p-text)}
 .md li{margin:2px 0}
 .md blockquote{margin:8px 0;padding:8px 12px;border-left:4px solid var(--t);background:color-mix(in srgb,var(--t) 8%,transparent)}
 .md blockquote p:last-child{margin:0}
+.md .callout{display:block;margin-bottom:4px;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--p-text)}
 .md code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.95em}
 .md :not(pre)>code{padding:1px 4px;border-radius:4px;background:color-mix(in srgb,var(--p) 10%,transparent)}
 /* Code blocks (CodeWrapperWidget): language + copy button top-right; a11y-light/dark token colours */
@@ -143,12 +151,9 @@ a.pill-title{color:var(--p-text)}
 .md .strip{display:flex;gap:10px;overflow-x:auto;margin:8px 0}
 .md .strip figure{flex:none;margin:0}
 .md .strip img{height:320px;width:auto}
-/* ASCII art: --cols glyphs fill the container (monospace advance ≈ .6em), no JS measuring */
-.md{container-type:inline-size}
-.ascii{border-radius:8px;overflow:hidden;background:color-mix(in srgb,var(--p) 10%,transparent);color:var(--fg)}
-.ascii pre{margin:0;padding:0;border:0;background:none;white-space:pre;letter-spacing:0;line-height:1;
-  font:calc(100cqi / var(--cols) / .6)/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-[data-mode=dark] .asc-l,:root:not([data-mode=dark]) .asc-d{display:none}
+/* ASCII art: inline SVG text scaled by its viewBox (see markdown.rs ascii_html) */
+.ascii{display:block;width:100%;max-width:640px;height:auto;margin:0 auto;border-radius:8px;background:color-mix(in srgb,var(--p) 10%,transparent)}
+.ascii text{fill:var(--fg);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre}
 /* Dithered images: crisp dots; --accent variants are greyscale tinted by the scheme primary */
 .dith{position:relative;display:inline-block;max-width:100%;line-height:0}
 .dith img{image-rendering:pixelated;border-radius:0}

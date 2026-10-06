@@ -62,10 +62,33 @@ pub struct Skill {
     pub start: NaiveDate,
     pub end: Option<NaiveDate>,
     #[serde(default)]
-    #[allow(dead_code)] // schema: not shown in the Flutter layout yet
-    pub sub_skills: Vec<String>,
+    pub sub_skills: Vec<SubSkill>,
     #[serde(skip)]
     pub body: String,
+    #[serde(skip)]
+    pub slug: String,
+}
+
+/// `- Bloc` or `- { name: Bloc, note: State management }`.
+#[derive(Deserialize)]
+#[serde(untagged)]
+pub enum SubSkill {
+    Name(String),
+    Full { name: String, note: Option<String> },
+}
+
+impl SubSkill {
+    pub fn name(&self) -> &str {
+        match self {
+            SubSkill::Name(n) | SubSkill::Full { name: n, .. } => n,
+        }
+    }
+    pub fn note(&self) -> Option<&str> {
+        match self {
+            SubSkill::Name(_) => None,
+            SubSkill::Full { note, .. } => note.as_deref(),
+        }
+    }
 }
 
 pub struct Site {
@@ -75,8 +98,14 @@ pub struct Site {
 }
 
 impl Site {
-    pub fn project_by_title(&self, title: &str) -> Option<&Project> {
-        self.projects.iter().find(|p| p.title.eq_ignore_ascii_case(title.trim()))
+    /// URL for a wikilink target: a project title, else a skill name (case-insensitive).
+    pub fn link(&self, target: &str) -> Option<String> {
+        let t = target.trim();
+        self.projects
+            .iter()
+            .find(|p| p.title.eq_ignore_ascii_case(t))
+            .map(|p| format!("/project/{}/", p.slug))
+            .or_else(|| self.skills.iter().find(|s| s.name.eq_ignore_ascii_case(t)).map(|s| format!("/skill/{}/", s.slug)))
     }
 }
 
@@ -112,6 +141,9 @@ pub fn load(dir: &Path, drafts: bool) -> Result<Site> {
     let mut skills: Vec<Skill> =
         parse_dir(&dir.join("skills"))?.into_iter().filter(|s: &Skill| drafts || !s.draft).collect();
     skills.sort_by_key(|s| s.order);
+    for s in &mut skills {
+        s.slug = slug(&s.name);
+    }
 
     Ok(Site { profile, projects, skills })
 }

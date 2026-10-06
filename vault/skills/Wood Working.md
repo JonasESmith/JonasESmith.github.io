@@ -1,8 +1,7 @@
 ---
 name: "Wood Working"
 order: 7
-draft: false
 start: "2020-01-01"
 ---
 
-Started making rock climbing holds for my home climbing wall, and from this simple start began creating furniture, cabinetry, and many other woodworking projects.
+I started by making rock climbing holds for my home climbing wall. From that simple start I moved on to furniture, cabinetry, and plenty of other woodworking projects.

@@ -28,8 +28,10 @@ def main():
     out = ROOT / (args[args.index("--out") + 1] if "--out" in args else "dist")
     pages = [a for a in args if a.startswith("/")]
     if not pages:
+        # Content pages only: skip passthrough files and meta-refresh redirect stubs.
         pages = sorted("/" + str(p.relative_to(out)).removesuffix("index.html")
-                       for p in out.rglob("*.html") if p.name not in SKIP)
+                       for p in out.rglob("*.html")
+                       if p.name not in SKIP and 'http-equiv="refresh"' not in p.read_text())
 
     sock = socket.socket(); sock.bind(("127.0.0.1", 0)); port = sock.getsockname()[1]; sock.close()
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(out))
@@ -44,7 +46,7 @@ def main():
     for page in pages:
         url = f"http://127.0.0.1:{port}{page}"
         urllib.request.urlopen(url).read()
-        dest = raw / f"{date}-{page.strip('/').replace('/', '_') or 'home'}.json"
+        dest = raw / f"{date}-{page.strip('/').replace('/', '_') or 'index'}.json"
         for _attempt in range(2):
             subprocess.run(["npx", "-y", "lighthouse@12", url, "--quiet", "--chrome-flags=--headless=new",
                             "--only-categories=performance,accessibility,best-practices,seo",

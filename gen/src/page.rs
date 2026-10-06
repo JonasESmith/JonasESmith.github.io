@@ -5,6 +5,7 @@ use crate::assets::{Assets, Fit};
 use crate::markdown;
 use crate::theme::{swatch_style, Themes};
 use crate::vault::{Project, Site, Skill};
+use chrono::Datelike;
 use anyhow::{Context, Result};
 use chrono::{NaiveDate, Utc};
 use std::fmt::Write;
@@ -28,6 +29,10 @@ pub fn render_site(site: &Site, themes: &Themes, assets: &mut Assets) -> Result<
     for p in &site.projects {
         let html = project(p, site, assets, &chrome).with_context(|| format!("project {}", p.title))?;
         pages.push((format!("project/{}/index.html", p.slug), html));
+    }
+    for s in &site.skills {
+        let html = skill(s, site, assets, &chrome).with_context(|| format!("skill {}", s.name))?;
+        pages.push((format!("skill/{}/index.html", s.slug), html));
     }
     pages.push(("404.html".to_string(), not_found(&chrome)));
     Ok(pages)
@@ -139,13 +144,14 @@ fn home(site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result<String> {
 
     write!(m, "<section class=\"a2\">{}<ul class=\"links\">", section_head("Notable Projects", KEYBOARD_CHEVRON))?;
     for p in &site.projects {
-        let ico = match &p.icon {
-            Some(name) => format!(" style=\"--i:url({})\"", assets.mask(name, 16)?),
-            None => String::new(),
+        // No icon: the tile shows the title's first letter instead.
+        let (ico, letter) = match &p.icon {
+            Some(name) => (format!(" style=\"--i:url({})\"", assets.mask(name, 16)?), String::new()),
+            None => (" data-letter".to_string(), esc(&p.title.chars().next().unwrap_or('?').to_string())),
         };
         write!(
             m,
-            "<li><a class=\"lsb\" href=\"/project/{}/\"><span class=\"lbl\">{}</span><span class=\"ico\"{ico}></span></a></li>",
+            "<li><a class=\"lsb\" href=\"/project/{}/\"><span class=\"lbl\">{}</span><span class=\"ico\"{ico}>{letter}</span></a></li>",
             p.slug,
             esc(&p.title)
         )?;
@@ -157,7 +163,8 @@ fn home(site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result<String> {
         let (attr, label) = skill_years(s, today);
         write!(
             m,
-            "<li><span class=\"lsb\"><span class=\"lbl\">{}</span><span class=\"yrs\"{attr}>{label} y</span></span></li>",
+            "<li><a class=\"lsb\" href=\"/skill/{}/\"><span class=\"lbl\">{}</span><span class=\"yrs\"{attr}>{label} y</span></a></li>",
+            s.slug,
             esc(&s.name)
         )?;
     }
@@ -279,6 +286,40 @@ fn project(p: &Project, site: &Site, assets: &mut Assets, chrome: &Chrome) -> Re
 
     let desc = p.description.clone().unwrap_or_else(|| p.title.clone());
     Ok(shell(chrome, &format!("{} · {}", p.title, site.profile.name), &desc, &m))
+}
+
+/// Skill page: same header pill as projects, a span line ("since 2018 · 8.7 y"), the sub-skills
+/// with their notes, then the note body (galleries, ASCII, dithering all work as in projects).
+fn skill(s: &Skill, site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result<String> {
+    let today = Utc::now().date_naive();
+    let (attr, label) = skill_years(s, today);
+    let span = match s.end {
+        Some(end) => format!("{}–{}", s.start.year(), end.year()),
+        None => format!("since {}", s.start.year()),
+    };
+    let mut m = String::from("<div class=\"col col-proj\"><div class=\"phead\"><div class=\"pill\">");
+    write!(
+        m,
+        "<a class=\"pill-back\" href=\"/\" aria-label=\"Back\">{}</a><span class=\"pill-title\"><h1>{}</h1></span></div>\
+         <div class=\"span\">{span} · <span{attr}>{label} y</span></div></div>",
+        icon(CHEVRON_BACK),
+        esc(&s.name)
+    )?;
+    if !s.sub_skills.is_empty() {
+        m.push_str("<div class=\"tech b1\"><div class=\"lbl-s\">Toolbox</div><ul class=\"subs\">");
+        for sub in &s.sub_skills {
+            write!(m, "<li><span class=\"chip\">{}</span>", esc(sub.name()))?;
+            if let Some(note) = sub.note() {
+                write!(m, "<span class=\"sub-note\">{}</span>", esc(note))?;
+            }
+            m.push_str("</li>");
+        }
+        m.push_str("</ul></div>");
+    }
+    let body = markdown::render(&s.body, site, assets, &s.name);
+    write!(m, "<hr class=\"pdiv\"><article class=\"md b3\">{body}</article></div>")?;
+    let desc = format!("{} — {span}.", s.name);
+    Ok(shell(chrome, &format!("{} · {}", s.name, site.profile.name), &desc, &m))
 }
 
 fn not_found(chrome: &Chrome) -> String {

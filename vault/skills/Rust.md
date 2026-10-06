@@ -1,17 +1,19 @@
 ---
 name: "Rust"
 order: 2
-draft: false
 start: "2023-05-01"
 sub_skills:
-  - "ActixWeb"
-  - "Clap"
-  - "Tokio"
-  - "Serde"
-  - "Diesel"
-  - "Postgres"
+  - { name: "Actix Web", note: "Server development: APIs, web hosting, and more" }
+  - { name: "Clap", note: "Terminal applications" }
+  - { name: "Tokio", note: "Async programming" }
+  - { name: "Serde", note: "<3" }
+  - { name: "Diesel", note: "ORM" }
+  - { name: "Postgres", note: "Database" }
 ---
 
-This basic site is actually built with rust (dioxus). And has made me feel incredibly strong as a developer, building cli's, fast and stable apis, and now some pretty fun projects (`I am currently porting my BFS dnd systems front-end using rust since its BE is already written in rust`). Rust has made me feel much more powerful as a developer. It has allowed me to take complex ideas and develop them into reality with relative ease. My best example of this is my [[Better Fantasy System]].
+Rust has made me feel much more powerful as a developer: CLIs, fast and stable APIs, and some pretty fun projects. It lets me take complex ideas and turn them into reality with relative ease. Even this site is Rust: a small static site generator turns my Obsidian notes into these pages.
 
-This project started as a simple console application, grew to a crafting system with complex struct interactions, and eventually became a full-stack app with a Flutter UI and a headless Rust API server. It's amazing to see how a small idea can grow into something so comprehensive and functional.
+My best example is the [[Better Fantasy System]]. It started as a simple console application, grew into a crafting system with complex struct interactions, and eventually became a full-stack app with a Flutter UI and a headless Rust API server. I've been porting its front end to Rust too, since the back end already is. It's amazing to see how a small idea can grow into something so comprehensive.
+
+> [!NOTE]
+> I've been incredibly bullish on Rust lately. Its performance, borrow checker, and strict types are a big part of it, and I've found that having such a strict compiler lets me use AI in a way I can generally trust.

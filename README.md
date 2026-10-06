@@ -28,7 +28,9 @@ Push to `master` to deploy (GitHub Actions → Pages).
 ## Writing content
 
 - `vault/profile.md`, `vault/projects/*.md`, `vault/skills/*.md` — YAML frontmatter + markdown.
-- Link projects with `[[Project]]` or `[[Project|text]]`.
+- Link projects or skills with `[[Name]]` or `[[Name|text]]`. Every skill gets its own page.
+- Skill sub-skills: `- { name: Bloc, note: State management }` (or just `- Bloc`).
+- Obsidian callouts work: `> [!NOTE]`.
 - Images: `![[file.png]]` or `![caption](path/file.png)`; consecutive image lines form a strip.
   Flags after an image: `--dither [--4|--8|--16] [--accent]`, `--ascii`.
 - `draft: true` hides a page (`just build-drafts` to preview).

@@ -1,7 +1,7 @@
 ---
 title: "Rock Climber Guide"
 description: "Climbers bible"
-order: 3
+order: 5
 draft: false
 icon: "rcg.png"
 start: "2023-06-01"
