@@ -308,9 +308,15 @@ fn skill(s: &Skill, site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result
     if !s.sub_skills.is_empty() {
         m.push_str("<div class=\"tech b1\"><div class=\"lbl-s\">Toolbox</div><ul class=\"subs\">");
         for sub in &s.sub_skills {
-            write!(m, "<li><span class=\"chip\">{}</span>", esc(sub.name()))?;
-            if let Some(note) = sub.note() {
-                write!(m, "<span class=\"sub-note\">{}</span>", esc(note))?;
+            match sub.note() {
+                // tabindex: tap (touch) or keyboard focus reveals the note, like hover does
+                Some(note) => write!(
+                    m,
+                    "<li><span class=\"chip\" tabindex=\"0\">{}</span><span class=\"sub-note\">{}</span>",
+                    esc(sub.name()),
+                    esc(note)
+                )?,
+                None => write!(m, "<li><span class=\"chip\">{}</span>", esc(sub.name()))?,
             }
             m.push_str("</li>");
         }
