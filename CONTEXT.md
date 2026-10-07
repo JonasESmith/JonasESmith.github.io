@@ -191,7 +191,7 @@ public/ ──(verbatim)──► page.rs       templates; inline CSS + init scr
 | Command | What it does |
 |---|---|
 | `just build` | Builds `vault/` into `dist/` |
-| `VERSION` | Site version shown in the footer centre with the build date (`v1.1 – MM/DD/YYYY`). Bumped by hand; read by `gen build --version`. |
+| `VERSION` | Base site version for the footer centre (`v1.1 – MM/DD/YYYY`, UTC build date). `gen build` adds one to the minor number per first-parent commit since `VERSION` last changed (`site_version` in `main.rs`), so each deploy to master increments it; CI checks out full history for this. No git history (Docker, shallow clone) → the base as is. |
 | `just build-drafts` | Also builds notes marked `draft: true` |
 | `just serve` | Serves `dist/` at `http://localhost:8000` |
 | `just report` | Size and budget report, saved to `perf/` (gitignored, local only) |

@@ -45,8 +45,7 @@ fn build(vault_dir: &Path, public_dir: &Path, out: &Path, cache: &Path, version_
     let t0 = Instant::now();
     let site = vault::load(vault_dir, drafts)?;
     let themes = theme::Themes::load()?;
-    // Site version for the footer, bumped by hand in VERSION; the build date is stamped alongside it.
-    let version = fs::read_to_string(version_file).ok().map(|v| v.trim().to_string()).filter(|v| !v.is_empty());
+    let version = site_version(version_file);
 
     if out.exists() {
         fs::remove_dir_all(out).with_context(|| format!("clearing {}", out.display()))?;
@@ -65,6 +64,35 @@ fn build(vault_dir: &Path, public_dir: &Path, out: &Path, cache: &Path, version_
     let images = assets.finish()?;
     eprintln!("built {} pages -> {} in {:.1?}; {images}", pages.len(), out.display(), t0.elapsed());
     Ok(())
+}
+
+/// Footer version. `VERSION` holds a base like "1.1"; every first-parent commit since that file last
+/// changed adds one to the minor number, so each deploy to master ticks it up (v1.1 → v1.2 → …) with
+/// no bot commits. A merged PR is one first-parent commit, so it counts once. Set VERSION to "2.0" to
+/// jump ahead; the count restarts from that commit. Without usable git history (Docker, shallow
+/// clones) the file's value is shown as is.
+fn site_version(file: &Path) -> Option<String> {
+    let base = fs::read_to_string(file).ok()?.trim().to_string();
+    if base.is_empty() {
+        return None;
+    }
+    let git = |args: &[&str]| -> Option<String> {
+        let out = std::process::Command::new("git").args(args).output().ok()?;
+        out.status.success().then(|| String::from_utf8_lossy(&out.stdout).trim().to_string())
+    };
+    let steps = (|| {
+        if git(&["rev-parse", "--is-shallow-repository"])? != "false" {
+            return None;
+        }
+        let path = file.to_str()?;
+        let since = git(&["log", "-1", "--format=%H", "--", path]).filter(|h| !h.is_empty())?;
+        git(&["rev-list", "--count", "--first-parent", &format!("{since}..HEAD")])?.parse::<u32>().ok()
+    })()
+    .unwrap_or(0);
+    match base.split_once('.').and_then(|(maj, min)| Some((maj, min.parse::<u32>().ok()?))) {
+        Some((major, minor)) => Some(format!("{major}.{}", minor + steps)),
+        None => Some(base),
+    }
 }
 
 /// Passthrough files (privacy notice, favicon, CNAME…) are copied byte-for-byte.

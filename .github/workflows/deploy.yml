@@ -31,6 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history: the footer version counts commits since VERSION changed
 
       - name: Restore generator binary
         id: gen-bin

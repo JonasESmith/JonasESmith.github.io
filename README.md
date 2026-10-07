@@ -25,8 +25,9 @@ just lighthouse-all # Lighthouse on every page -> perf/
 
 Push to `master` to deploy (GitHub Actions → Pages).
 
-The footer shows the site version and build date (`v1.1 – 10/07/2026`). Bump the number in `VERSION`
-when you want; the date is stamped automatically on every build.
+The footer shows the site version and build date (`v1.1 – 10/07/2026`). `VERSION` holds the base; each
+commit on the branch since `VERSION` last changed adds one to the minor number, so every deploy to
+`master` ticks it up (v1.1 → v1.2 → …; a merged PR counts once). Set `VERSION` to `2.0` to jump ahead.
 
 ## Writing content
 
