@@ -125,7 +125,8 @@ fn shell(chrome: &Chrome, title: &str, desc: &str, main: &str) -> String {
 fn home(site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result<String> {
     let pr = &site.profile;
     let today = Utc::now().date_naive();
-    let days = (today - pr.birth_date).num_days();
+    // Age as a version number, one decimal, rounded down so it never reads a year early ("v30.8").
+    let age = ((today - pr.birth_date).num_days() as f64 / 365.25 * 10.0).floor() / 10.0;
     let avatar = assets.picture(&pr.avatar, Fit::Cover(48))?.html("", " class=\"avatar\"");
     let role = pr.role.as_deref().map(|r| format!("<span class=\"role\">{}</span>", esc(r))).unwrap_or_default();
     let about = markdown::render(&pr.body, site, assets, "profile");
@@ -134,12 +135,10 @@ fn home(site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result<String> {
     write!(
         m,
         "<details class=\"card a1\"><summary>\
-         {avatar}<span class=\"who\"><b class=\"handle\">{}</b>{role}</span><b class=\"ver\" data-birth=\"{}\">v{}.{}</b>\
+         {avatar}<span class=\"who\"><b class=\"handle\">{}</b>{role}</span><b class=\"ver\" data-birth=\"{}\">v{age:.1}</b>\
          <span class=\"chev\">{}</span></summary><div class=\"about\"><hr><div class=\"md\">{about}</div></div></details>",
         esc(&pr.handle),
         pr.birth_date,
-        days / 365,
-        days % 365,
         icon(CHEVRON_DOWN)
     )?;
 

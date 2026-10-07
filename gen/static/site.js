@@ -171,8 +171,8 @@
   // --- Build-time values go stale between deploys; refresh them.
   const day = 864e5, now = Date.now();
   $$("[data-birth]").forEach(e => {
-    const t = Math.floor((now - Date.parse(e.dataset.birth)) / day);
-    e.textContent = "v" + Math.floor(t / 365) + "." + (t % 365);
+    const age = Math.floor((now - Date.parse(e.dataset.birth)) / day / 365.25 * 10) / 10;
+    e.textContent = "v" + age.toFixed(1);
   });
   $$("[data-since]").forEach(e => {
     e.textContent = ((now - Date.parse(e.dataset.since)) / day / 365.25).toFixed(1) + " y";
