@@ -192,8 +192,8 @@ public/ ──(verbatim)──► page.rs       templates; inline CSS + init scr
 | `just build` | Builds `vault/` into `dist/` |
 | `just build-drafts` | Also builds projects/skills marked `draft: true` |
 | `just serve` | Serves `dist/` at `http://localhost:8000` |
-| `just report` | Size and budget report, saved to `perf/` |
-| `just lighthouse /path/` | Lighthouse run against `just serve`; the JSON lands in `perf/lighthouse/` (gitignored) |
+| `just report` | Size and budget report, saved to `perf/` (gitignored, local only) |
+| `just lighthouse /path/` | Lighthouse run against `just serve`; the JSON lands in `perf/lighthouse/` |
 | `just check` | CI gate: build, then fail if any page is over budget (`gen report --check`) |
 | `just lighthouse-all` | Lighthouse on every page. Starts its own server, warms each URL, retries interstitials. Summary goes to `perf/lighthouse-<date>-<rev>.md`. |
 
@@ -467,7 +467,7 @@ Lighthouse notes:
   - Committed P4 as `da0bee1`.
   - Screenshotted the live Flutter site (puppeteer, both modes), sampled surface colours and fitted `theme.rs`. Fixed the layout differences found: vertical centring, glow origin, footer chip colour, keyboard and filled-bars icons.
   - Added `gen report --check` (verified: exit 1 on an oversized page, 0 when clean), `just check`, the CI workflow, and `scripts/lighthouse.py` / `just lighthouse-all`.
-  - Lighthouse: 100 in all four categories on all 6 content pages (`perf/lighthouse-2026-10-05-*.md`).
+  - Lighthouse (mobile, simulated slow 4G, local server): 100 in all four categories on all 6 content pages. FCP 0.8–1.1s, simulated LCP 1.1–1.7s (observed 41–322ms), page weight 36–242 KiB.
   - Remaining non-scored flags:
     - `unused-css-rules` (one shared inline stylesheet).
     - `uses-responsive-images`: the Lighthouse device is DPR 1.75, so 2x is slightly larger than needed. A 1.5x variant would shave ~15KB per page; not worth it yet.
