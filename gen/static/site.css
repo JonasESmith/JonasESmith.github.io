@@ -1,3 +1,5 @@
+/* Readability knobs for project/skill pages: column width and body text. */
+:root{--page-w:720px;--md-fs:12px;--md-lh:16px}
 /* Layout + components. Scheme variables (--p --s --t --bg --card --bar --fg --div --dis --on-p --icon-fg)
    are generated from gen/themes.toml and appended after this file. Sizes mirror the Flutter M3 text theme. */
 *,*::before,*::after{box-sizing:border-box}
@@ -18,7 +20,7 @@ main{flex:1;min-width:0;display:flex;justify-content:center}
 .col{width:100%}
 /* Flutter centres the home column vertically (Center inside a min-height box); auto margins stay safe on overflow */
 .col-home{max-width:500px;padding:160px 0 184px;margin-block:auto}
-.col-proj{max-width:900px;padding:32px 8px 256px}
+.col-proj{max-width:var(--page-w);padding:32px 8px 256px}
 
 /* Footer status bar */
 .bar{position:sticky;bottom:0;z-index:2;display:flex;justify-content:space-between;flex-wrap:wrap;background:var(--bar);border-top:1px solid var(--div)}
@@ -114,7 +116,7 @@ a.pill-title{color:var(--p-text)}
 .pdiv{margin:8px 8px 0 0}
 
 /* Markdown (VoxMarkdown: body text is M3 bodySmall) */
-.md{font-size:12px;line-height:16px;letter-spacing:.4px;overflow-wrap:anywhere}
+.md{font-size:var(--md-fs);line-height:var(--md-lh);letter-spacing:.4px;overflow-wrap:anywhere}
 .md>:first-child{margin-top:8px}
 .md p{margin:0 0 8px}
 /* Heading tags are re-ranked for a11y; .hN keeps the authored size */
