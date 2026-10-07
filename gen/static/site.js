@@ -27,6 +27,41 @@
     if (matchMedia("(pointer:fine)").matches) q.focus();
   });
 
+  // --- About card: smooth open/close. The card's height eases open, then each block of text fades
+  // and rises in, staggered. Closing fades the text and eases back. Without JS (or with reduced
+  // motion) the native <details> toggle still works, just instantly.
+  const card = $(".card");
+  if (card && !reduced) {
+    const sum = $("summary", card), about = $(".about", card);
+    const ease = "cubic-bezier(.2,.7,.2,1)";
+    let size, fade;
+    const done = () => { card.style.overflow = ""; size = fade = null };
+    sum.addEventListener("click", e => {
+      e.preventDefault();
+      const opening = !card.open || card.classList.contains("closing");
+      const from = card.offsetHeight;  // mid-animation height when interrupted
+      size?.cancel(); fade?.cancel();
+      card.style.overflow = "hidden";
+      if (opening) {
+        card.classList.remove("closing");
+        card.open = true;
+        const to = card.offsetHeight;
+        size = card.animate({ height: [from + "px", to + "px"] }, { duration: 520, easing: ease });
+        const blocks = [$("hr", about), ...$(".md", about).children];
+        blocks.forEach((b, i) => b.animate(
+          [{ opacity: 0, transform: "translateY(10px)", filter: "blur(4px)" }, { opacity: 1, transform: "none", filter: "none" }],
+          { duration: 480, delay: 90 + i * 70, easing: ease, fill: "backwards" }));
+        size.onfinish = done;
+      } else {
+        card.classList.add("closing");
+        card.open = false; const to = card.offsetHeight; card.open = true;
+        fade = about.animate({ opacity: [1, 0], transform: ["none", "translateY(-6px)"] }, { duration: 200, easing: "ease-in", fill: "forwards" });
+        size = card.animate({ height: [from + "px", to + "px"] }, { duration: 420, easing: ease });
+        size.onfinish = () => { card.open = false; card.classList.remove("closing"); fade.cancel(); done() };
+      }
+    });
+  }
+
   // --- Lightbox over the project gallery.
   const lb = $("#lb"), shots = $$("[data-gallery]");
   let cur = 0;

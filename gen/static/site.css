@@ -61,15 +61,22 @@ main{flex:1;min-width:0;display:flex;justify-content:center}
 [data-mode=dark] .dots i:nth-child(3){background:var(--cd)}
 
 /* Home */
-.card{display:block;border-radius:8px;padding:4px 8px;background:color-mix(in srgb,var(--p) 5%,transparent);
-  border:1px solid color-mix(in srgb,var(--p) 10%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.card summary{display:flex;align-items:center;gap:8px;list-style:none;cursor:pointer;font-size:16px;line-height:24px}
+.card{display:block;border-radius:12px;padding:8px;background:color-mix(in srgb,var(--p) 6%,transparent);
+  border:1px solid color-mix(in srgb,var(--p) 22%,transparent);
+  box-shadow:0 1px 0 color-mix(in srgb,var(--p) 8%,transparent) inset,0 12px 32px -18px color-mix(in srgb,var(--p) 45%,transparent);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transition:border-color .3s,box-shadow .3s}
+.card:hover,.card[open]{border-color:color-mix(in srgb,var(--p) 38%,transparent)}
+.card summary{display:flex;align-items:center;gap:12px;list-style:none;cursor:pointer;font-size:16px;line-height:24px}
 .card summary::-webkit-details-marker{display:none}
-.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover}
-.handle{flex:1}
-.chev{width:32px;height:32px;border-radius:50%;background:var(--div);color:var(--dis);display:grid;place-items:center}
-.chev .i{transition:transform .3s}
-.card[open] .chev .i{transform:rotate(180deg)}
+.avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px color-mix(in srgb,var(--p) 55%,transparent)}
+.who{flex:1;min-width:0;display:flex;flex-direction:column}
+.role{font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chev{width:32px;height:32px;border-radius:50%;background:var(--div);color:var(--dis);display:grid;place-items:center;transition:background .3s,color .3s}
+.card:hover .chev{background:color-mix(in srgb,var(--p) 25%,var(--div));color:var(--fg)}
+.chev .i{transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+.card[open]:not(.closing) .chev .i{transform:rotate(180deg)}
+.about .md{font-size:13px;line-height:20px}
+.about .md p:last-child{margin-bottom:4px}
 .sec{display:flex;align-items:center;margin:16px 0 0;padding-left:4px;font-size:12px;line-height:16px;letter-spacing:.4px;font-weight:400}
 .sec span{padding-bottom:8px}
 .sec hr{flex:1;margin:0 8px 0 16px}

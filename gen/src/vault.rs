@@ -38,6 +38,8 @@ pub const SECTIONS: &[Section] = &[
 pub struct Profile {
     pub name: String,
     pub handle: String,
+    /// One-line role under the handle on the home card ("Full-stack software engineer").
+    pub role: Option<String>,
     pub birth_date: NaiveDate,
     pub avatar: String,
     pub email: String,

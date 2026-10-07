@@ -126,15 +126,16 @@ fn home(site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result<String> {
     let pr = &site.profile;
     let today = Utc::now().date_naive();
     let days = (today - pr.birth_date).num_days();
-    let avatar = assets.picture(&pr.avatar, Fit::Cover(40))?.html("", " class=\"avatar\"");
+    let avatar = assets.picture(&pr.avatar, Fit::Cover(48))?.html("", " class=\"avatar\"");
+    let role = pr.role.as_deref().map(|r| format!("<span class=\"role\">{}</span>", esc(r))).unwrap_or_default();
     let about = markdown::render(&pr.body, site, assets, "profile");
 
     let mut m = String::from("<div class=\"col col-home\">");
     write!(
         m,
         "<details class=\"card a1\"><summary>\
-         {avatar}<b class=\"handle\">{}</b><b class=\"ver\" data-birth=\"{}\">v{}.{}</b>\
-         <span class=\"chev\">{}</span></summary><hr><div class=\"md\">{about}</div></details>",
+         {avatar}<span class=\"who\"><b class=\"handle\">{}</b>{role}</span><b class=\"ver\" data-birth=\"{}\">v{}.{}</b>\
+         <span class=\"chev\">{}</span></summary><div class=\"about\"><hr><div class=\"md\">{about}</div></div></details>",
         esc(&pr.handle),
         pr.birth_date,
         days / 365,
