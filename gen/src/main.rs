@@ -1,6 +1,6 @@
 //! portfolio-gen: Obsidian vault -> prerendered static portfolio.
 //!
-//! gen build  [--vault vault] [--public public] [--out dist] [--cache .cache/img] [--drafts]
+//! gen build  [--vault vault] [--public public] [--out dist] [--cache .cache/img] [--version VERSION] [--drafts]
 //! gen report [--out dist] [--save perf] [--check]   (--check: CI gate, exit 1 when over budget, no file written)
 
 mod assets;
@@ -30,20 +30,23 @@ fn main() -> Result<()> {
             &flag("--public", "public"),
             &out,
             &flag("--cache", ".cache/img"),
+            &flag("--version", "VERSION"),
             args.iter().any(|a| a == "--drafts"),
         ),
         "report" => report::run(&out, &flag("--save", "perf"), args.iter().any(|a| a == "--check")),
         _ => {
-            eprintln!("usage: gen [build|report] [--vault DIR] [--public DIR] [--out DIR] [--cache DIR] [--drafts]");
+            eprintln!("usage: gen [build|report] [--vault DIR] [--public DIR] [--out DIR] [--cache DIR] [--version FILE] [--drafts]");
             std::process::exit(2)
         }
     }
 }
 
-fn build(vault_dir: &Path, public_dir: &Path, out: &Path, cache: &Path, drafts: bool) -> Result<()> {
+fn build(vault_dir: &Path, public_dir: &Path, out: &Path, cache: &Path, version_file: &Path, drafts: bool) -> Result<()> {
     let t0 = Instant::now();
     let site = vault::load(vault_dir, drafts)?;
     let themes = theme::Themes::load()?;
+    // Site version for the footer, bumped by hand in VERSION; the build date is stamped alongside it.
+    let version = fs::read_to_string(version_file).ok().map(|v| v.trim().to_string()).filter(|v| !v.is_empty());
 
     if out.exists() {
         fs::remove_dir_all(out).with_context(|| format!("clearing {}", out.display()))?;
@@ -52,7 +55,7 @@ fn build(vault_dir: &Path, public_dir: &Path, out: &Path, cache: &Path, drafts: 
     copy_dir(public_dir, out)?;
 
     let mut assets = assets::Assets::new(vault_dir, out, cache)?;
-    let pages = page::render_site(&site, &themes, &mut assets)?;
+    let pages = page::render_site(&site, &themes, &mut assets, version.as_deref())?;
     for (rel, html) in &pages {
         let path = out.join(rel);
         fs::create_dir_all(path.parent().unwrap())?;

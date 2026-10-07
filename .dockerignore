@@ -7,4 +7,5 @@
 !vault/
 !public/
 !docker/
+!VERSION
 **/.DS_Store

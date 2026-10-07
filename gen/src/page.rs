@@ -23,8 +23,8 @@ struct Chrome {
     footer: String,
 }
 
-pub fn render_site(site: &Site, themes: &Themes, assets: &mut Assets) -> Result<Vec<(String, String)>> {
-    let chrome = chrome(site, themes, assets)?;
+pub fn render_site(site: &Site, themes: &Themes, assets: &mut Assets, version: Option<&str>) -> Result<Vec<(String, String)>> {
+    let chrome = chrome(site, themes, assets, version)?;
     let mut pages = vec![("index.html".to_string(), home(site, assets, &chrome)?)];
     for p in &site.projects {
         let html = project(p, site, assets, &chrome).with_context(|| format!("project {}", p.title))?;
@@ -38,7 +38,7 @@ pub fn render_site(site: &Site, themes: &Themes, assets: &mut Assets) -> Result<
     Ok(pages)
 }
 
-fn chrome(site: &Site, themes: &Themes, assets: &mut Assets) -> Result<Chrome> {
+fn chrome(site: &Site, themes: &Themes, assets: &mut Assets, version: Option<&str>) -> Result<Chrome> {
     let ids: Vec<&str> = themes.scheme.iter().map(|s| s.id.as_str()).collect();
     let init = INIT_JS.trim().replace("__SCHEMES__", &ids.join("|"));
     let js_url = assets.write_hashed("site", "js", SITE_JS.trim().as_bytes())?;
@@ -70,7 +70,13 @@ fn chrome(site: &Site, themes: &Themes, assets: &mut Assets) -> Result<Chrome> {
         icon(CURSOR),
         icon(CURSOR_OFF)
     )?;
-    f.push_str("</div><nav class=\"bar-r\">");
+    f.push_str("</div>");
+    // Centre of the footer: site version and the date this build was made ("v1.1 – 10/07/2026").
+    if let Some(v) = version {
+        let date = Utc::now().format("%m/%d/%Y");
+        write!(f, "<span class=\"bar-v\" title=\"Site version and build date\">v{} – {date}</span>", esc(v))?;
+    }
+    f.push_str("<nav class=\"bar-r\">");
     for link in &site.profile.links {
         let host = link.trim_start_matches("https://").trim_start_matches("http://").trim_start_matches("www.");
         let host = host.split('/').next().unwrap_or(host);

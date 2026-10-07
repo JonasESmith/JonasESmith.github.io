@@ -191,6 +191,7 @@ public/ ──(verbatim)──► page.rs       templates; inline CSS + init scr
 | Command | What it does |
 |---|---|
 | `just build` | Builds `vault/` into `dist/` |
+| `VERSION` | Site version shown in the footer centre with the build date (`v1.1 – MM/DD/YYYY`). Bumped by hand; read by `gen build --version`. |
 | `just build-drafts` | Also builds notes marked `draft: true` |
 | `just serve` | Serves `dist/` at `http://localhost:8000` |
 | `just report` | Size and budget report, saved to `perf/` (gitignored, local only) |

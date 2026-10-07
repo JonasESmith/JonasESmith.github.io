@@ -25,6 +25,9 @@ just lighthouse-all # Lighthouse on every page -> perf/
 
 Push to `master` to deploy (GitHub Actions → Pages).
 
+The footer shows the site version and build date (`v1.1 – 10/07/2026`). Bump the number in `VERSION`
+when you want; the date is stamped automatically on every build.
+
 ## Writing content
 
 - `vault/profile.md` plus one folder per section — YAML frontmatter + markdown. Home page order:

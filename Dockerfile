@@ -15,6 +15,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
  && cp gen/target/release/gen /usr/local/bin/gen
 COPY vault/ vault/
 COPY public/ public/
+COPY VERSION ./
 ARG DRAFTS=""
 # Encoded images persist in a cache mount, like .cache/img locally and in CI.
 RUN --mount=type=cache,target=/site/.cache/img \

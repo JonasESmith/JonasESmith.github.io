@@ -23,8 +23,11 @@ main{flex:1;min-width:0;display:flex;justify-content:center}
 .col-proj{max-width:var(--page-w);padding:32px 8px 256px}
 
 /* Footer status bar */
-.bar{position:sticky;bottom:0;z-index:2;display:flex;justify-content:space-between;flex-wrap:wrap;background:var(--bar);border-top:1px solid var(--div)}
+.bar{position:sticky;bottom:0;z-index:2;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;background:var(--bar);border-top:1px solid var(--div)}
 .bar-l,.bar-r{display:flex;flex-wrap:wrap}
+.bar-l{grid-column:1;justify-self:start}
+.bar-r{grid-column:3;justify-self:end;justify-content:flex-end}
+.bar-v{grid-column:2;padding:0 12px;font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .bb{display:inline-flex;align-items:center;gap:8px;padding:4px 8px;font:inherit;font-size:12px;line-height:16px;letter-spacing:.4px;
   color:var(--fg);background:var(--hdr);border:0;border-right:1px solid var(--div);text-decoration:none;cursor:pointer}
 .bar-r .bb{border-right:0;border-left:1px solid var(--div)}
@@ -36,7 +39,7 @@ main{flex:1;min-width:0;display:flex;justify-content:center}
 .f-on{display:inline-flex}
 [data-follower=off] .f-on{display:none}
 [data-follower=off] .f-off{display:inline-flex}
-@media(max-width:599px){.bar{flex-direction:column;align-items:center}.bar .email{display:none}.col-home{padding-right:8px}}
+@media(max-width:599px){.bar{display:flex;flex-direction:column;align-items:center}.bar-v{order:-1;padding:2px 0}.bar .email{display:none}.col-home{padding-right:8px}}
 
 /* Scheme palette (Cmd/Ctrl+P) */
 #schemes{margin:16px auto auto;width:600px;max-width:calc(100% - 32px);max-height:60vh;padding:8px;color:var(--fg);
