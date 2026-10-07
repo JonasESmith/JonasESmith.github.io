@@ -1,6 +1,6 @@
 /* Readability knobs for project/skill pages: column width and body text. */
 :root{--page-w:720px;--md-fs:12px;--md-lh:16px}
-/* Layout + components. Scheme variables (--p --s --t --bg --card --bar --fg --div --dis --on-p --icon-fg)
+/* Layout + components. Scheme variables (--p --s --t --bg --card --bar --fg --div --dis --on-p --on-link --on-link-v)
    are generated from gen/themes.toml and appended after this file. Sizes mirror the Flutter M3 text theme. */
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;color-scheme:light}
@@ -84,8 +84,10 @@ main{flex:1;min-width:0;display:flex;justify-content:center}
 a.lsb:visited{color:var(--link-v)}
 .ico{width:20px;height:20px;padding:2px;margin-right:8px;border-radius:4px;background-color:var(--link);display:grid}
 a.lsb:visited .ico{background-color:var(--link-v)}
-.ico::before{content:"";background:var(--icon-fg);-webkit-mask:var(--i) center/contain no-repeat;mask:var(--i) center/contain no-repeat}
-.ico[data-letter]{place-items:center;font-size:11px;font-weight:700;line-height:1;color:var(--icon-fg)}
+.ico::before{content:"";background-color:var(--on-link);-webkit-mask:var(--i) center/contain no-repeat;mask:var(--i) center/contain no-repeat}
+.ico[data-letter]{place-items:center;font-size:11px;font-weight:700;line-height:1;color:var(--on-link)}
+a.lsb:visited .ico::before{background-color:var(--on-link-v)}
+a.lsb:visited .ico[data-letter]{color:var(--on-link-v)}
 .ico[data-letter]::before{content:none}
 .yrs{flex:none;white-space:nowrap;font-size:12px;line-height:16px;color:var(--fg);padding:0 8px 0 8px;margin-right:8px}
 .nf{display:flex;align-items:center;gap:8px;padding:8px}

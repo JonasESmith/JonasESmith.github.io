@@ -51,6 +51,14 @@ impl Rgb {
             .find(|c| bgs.iter().all(|bg| c.contrast(*bg) >= 4.6))
             .unwrap_or(toward)
     }
+    /// Glyph colour for an icon tile filled with `self`: Flutter's translucent white (.7), unless that
+    /// blended white falls below 3:1 (WCAG non-text contrast) on a light tile; then black (.87).
+    /// White is preferred because saturated mid-tones (the blue link tiles) look right with it, even
+    /// where black would score higher.
+    fn on_tile(self) -> &'static str {
+        let white = self.mix(Rgb(255.0, 255.0, 255.0), 0.7);
+        if white.contrast(self) >= 3.0 { "rgba(255,255,255,.7)" } else { "rgba(0,0,0,.87)" }
+    }
     fn hex(self) -> String {
         format!("#{:02x}{:02x}{:02x}", self.0.round() as u8, self.1.round() as u8, self.2.round() as u8)
     }
@@ -95,9 +103,8 @@ fn vars(c: &[String; 3], dark: bool) -> Result<String> {
     let hdr = if dark { base.mix(p, 0.34) } else { base.mix(p, 0.2) };
     let black = Rgb(0.0, 0.0, 0.0);
     let white = Rgb(255.0, 255.0, 255.0);
-    // Text on primary: whichever of black/white contrasts more. Icon tint keeps Flutter's literal 0.5 rule.
+    // Text on primary: whichever of black/white contrasts more.
     let on_p = if p.luminance() > 0.179 { black } else { white };
-    let p_light = p.luminance() > 0.5;
     // Footer bar: card @ 30% over the scaffold, flattened so content scrolling underneath can't show through.
     // (Opaque on purpose: the bar is sticky over content.)
     let bar = bg.mix(card, 0.3);
@@ -111,8 +118,8 @@ fn vars(c: &[String; 3], dark: bool) -> Result<String> {
     let link_v = t.legible_on(&surfaces, toward);
     let p_text = p.legible_on(&[bg, bg.mix(p, 0.1)], toward);
     Ok(format!(
-        "--p:{};--s:{};--t:{};--bg:{};--card:{};--bar:{};--hdr:{};--fg:{};--div:{};--dis:{};--muted:{};--on-p:{};--icon-fg:{};\
-         --link:{};--link-v:{};--p-text:{}",
+        "--p:{};--s:{};--t:{};--bg:{};--card:{};--bar:{};--hdr:{};--fg:{};--div:{};--dis:{};--muted:{};--on-p:{};\
+         --link:{};--link-v:{};--on-link:{};--on-link-v:{};--p-text:{}",
         p.hex(),
         s.hex(),
         t.hex(),
@@ -125,9 +132,10 @@ fn vars(c: &[String; 3], dark: bool) -> Result<String> {
         bg.mix(on, 0.38).hex(),
         bg.mix(on, 0.72).hex(),
         on_p.hex(),
-        if p_light { "rgba(0,0,0,.87)" } else { "rgba(255,255,255,.7)" },
         link.hex(),
         link_v.hex(),
+        link.on_tile(),
+        link_v.on_tile(),
         p_text.hex(),
     ))
 }
