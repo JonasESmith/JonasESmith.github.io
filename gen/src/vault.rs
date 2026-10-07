@@ -157,7 +157,7 @@ impl Site {
     }
 }
 
-/// URL slug. Matches the Flutter site's scheme (`/project/Rock-Climber-Guide`) so old links keep working.
+/// URL slug. Matches the Flutter site's scheme (`/project/Pakmo`) so old links keep working.
 pub fn slug(title: &str) -> String {
     title
         .trim()

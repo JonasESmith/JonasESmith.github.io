@@ -53,7 +53,7 @@ The Rust version does all of that work once, at build time. Each page arrives as
 |---|---|---|---|
 | Home | 8.7 KB | 17.7 KB | — |
 | [[Eqalink]] | 8.6 KB | 63.3 KB | 191.6 KB |
-| [[Rock Climber Guide]] | 8.8 KB | 73.0 KB | 149.7 KB |
+| [[HaiiJo]] | 8.8 KB | 73.0 KB | 149.7 KB |
 | [[Better Fantasy System]] | 8.4 KB | 86.1 KB | 94.6 KB |
 | [[Pakmo]] | 7.9 KB | 36.3 KB | — |
 | A skill page | ~7.5 KB | ~10 KB | — |
@@ -64,7 +64,7 @@ The Rust version does all of that work once, at build time. Each page arrives as
 |---|---|---|---|
 | Home | 148 ms | 148 ms | 214 ms |
 | [[Eqalink]] | 132 ms | 300 ms | 281 ms |
-| [[Rock Climber Guide]] | 148 ms | 312 ms | 282 ms |
+| [[HaiiJo]] | 148 ms | 312 ms | 282 ms |
 
 Every page is fully drawn in about a third of a second, screenshot-heavy ones included.
 

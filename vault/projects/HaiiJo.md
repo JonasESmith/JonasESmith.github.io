@@ -1,5 +1,5 @@
 ---
-title: "Rock Climber Guide"
+title: "HaiiJo"
 description: "Climbers bible"
 order: 5
 draft: false

@@ -14,7 +14,7 @@ Hi there, I'm Jonas!
 
 I'm a full-stack software engineer, currently at [[Midwestern Interactive|MWI]]. I love building useful tools and fun side projects. Over the past 8 years, from green startups to larger companies, I've shipped applications on iOS, Android, web, desktop, and even smart watches. I care most about reusable, easy-to-maintain code, mostly in [[Rust]], JavaScript, Dart, and [[Python]], reaching for other languages when a project calls for them.
 
-I'm particularly proud of [[Eqalink]], which I took from an idea with a client to a full-fledged social media platform. Other favorites range from [[Rock Climber Guide]] and [[Pakmo]] to things built just for fun, like the [[Better Fantasy System]].
+I'm particularly proud of [[Eqalink]], which I took from an idea with a client to a full-fledged social media platform. Other favorites range from [[HaiiJo]] and [[Pakmo]] to things built just for fun, like the [[Better Fantasy System]].
 
 My main passions in life are:
 
