@@ -242,7 +242,7 @@ Each page ships:
 ### Behaviours that need no JS
 
 - **About card:** `<details>`.
-- **Visited links:** purple via native `a:visited`, including the icon tile.
+- **Visited links:** the scheme's tertiary colour via native `a:visited`, including the icon tile.
 - **Project icons:** recoloured via CSS `mask`.
 - **Mode and scheme labels:** switched by CSS from `data-*` attributes.
 - **Scheme picker:** the native `popover` attribute.
@@ -343,7 +343,7 @@ Each page ships:
 - The cursor glow uses gradients that fade to transparent rather than a full-screen 100σ backdrop blur, which is too expensive on mobile GPUs. The 5% noise layer is dropped: under Flutter's blur it was invisible.
 - Matching Flutter: the home column is vertically centred, and footer buttons carry the `secondaryHeaderColor` chip background.
 - Glow, by owner request: subtler, tapered, blurred, with grain, and it fades in at the cursor on first move. Flutter's glow started in the top-left corner and swept to the cursor.
-- Link colours are slightly darker in light mode and lighter in dark mode than iOS #007AFF / #AF52DE, to pass WCAG AA.
+- Links are iOS #007AFF; visited links use each scheme's tertiary colour instead of Flutter's fixed #AF52DE. Both are nudged darker (light mode) or lighter (dark mode) only as far as needed to pass WCAG AA.
 - The scheme persists between visits; Flutter reset it to Midnight on every load.
 - Entrance animations start immediately and finish within 600ms. Flutter waited 600ms first.
 - The broken profile link (BFS → Eqalink) is fixed.

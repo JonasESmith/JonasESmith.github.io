@@ -101,13 +101,14 @@ fn vars(c: &[String; 3], dark: bool) -> Result<String> {
     // Footer bar: card @ 30% over the scaffold, flattened so content scrolling underneath can't show through.
     // (Opaque on purpose: the bar is sticky over content.)
     let bar = bg.mix(card, 0.3);
-    // Text-safe variants: Flutter used iOS #007AFF / #AF52DE links and raw primary for link-ish text,
-    // which fail AA on several surfaces. Nudge toward black (light) / white (dark) only as far as needed.
+    // Text-safe variants: Flutter used iOS #007AFF links and raw primary for link-ish text, which fail AA
+    // on several surfaces. Nudge toward black (light) / white (dark) only as far as needed.
+    // Visited links take the scheme's tertiary colour, so they match the selected theme.
     let card_on_bg = bg.mix(p, 0.05);
     let toward = if dark { white } else { black };
     let surfaces = [bg, card_on_bg, card];
     let link = Rgb(0.0, 122.0, 255.0).legible_on(&surfaces, toward);
-    let link_v = Rgb(175.0, 82.0, 222.0).legible_on(&surfaces, toward);
+    let link_v = t.legible_on(&surfaces, toward);
     let p_text = p.legible_on(&[bg, bg.mix(p, 0.1)], toward);
     Ok(format!(
         "--p:{};--s:{};--t:{};--bg:{};--card:{};--bar:{};--hdr:{};--fg:{};--div:{};--dis:{};--muted:{};--on-p:{};--icon-fg:{};\
