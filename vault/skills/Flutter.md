@@ -2,9 +2,13 @@
 name: "Flutter"
 order: 1
 start: "2018-02-01"
+end: "2025-06-03"
 sub_skills:
   - { name: "Bloc", note: "State management" }
-  - { name: "flutter_modular", note: "Dependency injection, navigation, modular file structure" }
+  - {
+      name: "flutter_modular",
+      note: "Dependency injection, navigation, modular file structure",
+    }
   - { name: "Firebase", note: "Deployment, data, and automation" }
   - { name: "Freezed", note: "Code generation" }
   - { name: "build_runner", note: "Code generation" }

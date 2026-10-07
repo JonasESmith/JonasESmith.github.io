@@ -3,6 +3,7 @@ title: "Midwestern Interactive"
 description: "Full-stack software engineer at MWI — my current role"
 order: 1
 url: "https://midwestern.com/"
+start: "2024-10-04"
 ---
 
 ![[mwi.png]] --ascii
