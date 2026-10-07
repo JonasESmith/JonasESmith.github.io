@@ -309,7 +309,7 @@ Each page ships:
   - Body: markdown.
 - **`skills/<Name>.md`** (one page each at `/skill/<Name>/`, linked from the home skill rows)
   - Frontmatter: `name`, `order`, `draft`, `start`, `end`, `sub_skills[]`. Each sub-skill is either `- Bloc` or `- { name: Bloc, note: State management }`.
-  - The page shows a span line ("since 2018 · 8.7 y"), a Toolbox list with the sub-skill notes, then the body. Galleries, ASCII art and dithering work in the body as in projects.
+  - The page shows a span line ("since 2018 · 8.7 y", or "2018–2025 · 7 years, 4 months" with an `end`), a Toolbox list with the sub-skill notes, then the body. Galleries, ASCII art and dithering work in the body as in projects.
   - The file name is free, since the display name comes from frontmatter. Avoid leading dots: `.Net.md` was hidden by Obsidian, so it's now `DotNet.md`.
 - **Links and embeds:**
   - `[[Name]]` and `[[Name|text]]` link to a project page, or failing that a skill page (case-insensitive).

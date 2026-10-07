@@ -163,7 +163,7 @@ fn home(site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result<String> {
         let (attr, label) = skill_years(s, today);
         write!(
             m,
-            "<li><a class=\"lsb\" href=\"/skill/{}/\"><span class=\"lbl\">{}</span><span class=\"yrs\"{attr}>{label} y</span></a></li>",
+            "<li><a class=\"lsb\" href=\"/skill/{}/\"><span class=\"lbl\">{}</span><span class=\"yrs\"{attr}>{label}</span></a></li>",
             s.slug,
             esc(&s.name)
         )?;
@@ -173,19 +173,19 @@ fn home(site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result<String> {
     Ok(shell(chrome, &pr.name, &format!("{} — projects and skills.", pr.name), &m))
 }
 
-/// Mirrors the Flutter site: ongoing skills show fractional years (refreshed client-side),
-/// finished ones show the whole duration.
+/// Mirrors the Flutter site: ongoing skills show fractional years ("8.7 y", refreshed client-side),
+/// finished ones show the whole duration ("7 years, 4 months").
 fn skill_years(s: &Skill, today: NaiveDate) -> (String, String) {
     match s.end {
         None => {
             let years = (today - s.start).num_days() as f64 / 365.25;
-            (format!(" data-since=\"{}\"", s.start), format!("{years:.1}"))
+            (format!(" data-since=\"{}\"", s.start), format!("{years:.1} y"))
         }
         Some(end) => {
             let days = (end - s.start).num_days();
             let (y, mo) = (days / 365, (days % 365) / 30);
             let label = match (y, mo) {
-                (y, 0) if y > 0 => format!("{y}"),
+                (y, 0) if y > 0 => format!("{y} year{}", plural(y)),
                 (y, mo) if y > 0 => format!("{y} year{}, {mo} month{}", plural(y), plural(mo)),
                 (_, mo) if mo > 0 => format!("{mo} month{}", plural(mo)),
                 _ => "Less than a month".into(),
@@ -301,7 +301,7 @@ fn skill(s: &Skill, site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result
     write!(
         m,
         "<a class=\"pill-back\" href=\"/\" aria-label=\"Back\">{}</a><span class=\"pill-title\"><h1>{}</h1></span></div>\
-         <div class=\"span\">{span} · <span{attr}>{label} y</span></div></div>",
+         <div class=\"span\">{span} · <span{attr}>{label}</span></div></div>",
         icon(CHEVRON_BACK),
         esc(&s.name)
     )?;
