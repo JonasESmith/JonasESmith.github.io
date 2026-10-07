@@ -1,0 +1,10 @@
+*
+!gen/Cargo.toml
+!gen/Cargo.lock
+!gen/src/
+!gen/static/
+!gen/themes.toml
+!vault/
+!public/
+!docker/
+**/.DS_Store
