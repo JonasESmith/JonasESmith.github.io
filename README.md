@@ -32,6 +32,7 @@ Push to `master` to deploy (GitHub Actions → Pages).
 - `vault/details/*.md` — unlisted project-style pages at `/details/<Name>/`, reachable only via
   links. Frontmatter is optional (the title defaults to the file name).
 - Link any page with `[[Name]]` or `[[Name|text]]`. Sections are defined in `SECTIONS` (`gen/src/vault.rs`).
+- `subtitle: "Social media platform"` adds a short tag after the name on the home page (truncated with … if long).
 - Skill sub-skills: `- { name: Bloc, note: State management }` (or just `- Bloc`).
 - Obsidian callouts work: `> [!NOTE]`.
 - Images: `![[file.png]]` or `![caption](path/file.png)`; consecutive image lines form a strip.

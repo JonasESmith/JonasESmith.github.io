@@ -53,6 +53,8 @@ pub struct Project {
     #[serde(default)]
     pub title: String,
     pub description: Option<String>,
+    /// Short tag shown after the title on the home page ("Social media platform").
+    pub subtitle: Option<String>,
     #[serde(default)]
     pub order: i32,
     #[serde(default)]
@@ -87,6 +89,8 @@ pub struct Tech {
 #[derive(Deserialize)]
 pub struct Skill {
     pub name: String,
+    /// Short tag shown after the name on the home page.
+    pub subtitle: Option<String>,
     #[serde(default)]
     pub order: i32,
     #[serde(default)]

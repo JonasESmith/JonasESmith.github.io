@@ -314,12 +314,13 @@ Each page ships:
   - `work`/`hobbies` reuse the `project`/`skill` URL prefixes, so moving a note between those folders keeps its URL. The build fails if two notes map to the same URL.
   - Empty sections are left off the home page.
 - **`projects/<Title>.md`** (also `work/`, `details/`)
-  - Frontmatter: `title`, `description`, `order`, `draft`, `url`, `icon`, `start`, `end`, `platforms[]` (ios/android/web/ipad/macos), `technologies[{name,url}]`, `gallery[]` (file names).
+  - Frontmatter: `title`, `description`, `subtitle`, `order`, `draft`, `url`, `icon`, `start`, `end`, `platforms[]` (ios/android/web/ipad/macos), `technologies[{name,url}]`, `gallery[]` (file names).
   - Body: markdown.
 - **`skills/<Name>.md`** (also `hobbies/`; one page each at `/skill/<Name>/`, linked from the home rows)
-  - Frontmatter: `name`, `order`, `draft`, `start`, `end`, `sub_skills[]`. Each sub-skill is either `- Bloc` or `- { name: Bloc, note: State management }`.
+  - Frontmatter: `name`, `subtitle`, `order`, `draft`, `start`, `end`, `sub_skills[]`. Each sub-skill is either `- Bloc` or `- { name: Bloc, note: State management }`.
   - The page shows a span line ("since 2018 · 8.7 y", or "2018–2025 · 7 years, 4 months" with an `end`), a Toolbox list with the sub-skill notes, then the body. Galleries, ASCII art and dithering work in the body as in projects.
   - The file name is free, since the display name comes from frontmatter. Avoid leading dots: `.Net.md` was hidden by Obsidian, so it's now `DotNet.md`.
+- **`subtitle`** (optional, projects and skills): a short tag shown after the name on the home page ("Eqalink – Social media platform"). It's a single line that CSS truncates with "…" before it reaches the icon or years column; the full text shows on hover.
 - **Links and embeds:**
   - `[[Name]]` and `[[Name|text]]` link to a project-layout page (work, projects, details), or failing that a skill-layout page (case-insensitive).
   - Obsidian callouts (`> [!NOTE]`, `> [!TIP] Custom title`) render as a labelled blockquote.

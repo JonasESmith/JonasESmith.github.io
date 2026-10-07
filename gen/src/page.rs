@@ -156,9 +156,9 @@ fn home(site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result<String> {
                     };
                     write!(
                         rows,
-                        "<li><a class=\"lsb\" href=\"{}\"><span class=\"lbl\">{}</span><span class=\"ico\"{ico}>{letter}</span></a></li>",
+                        "<li><a class=\"lsb\" href=\"{}\">{}<span class=\"ico\"{ico}>{letter}</span></a></li>",
                         p.url(),
-                        esc(&p.title)
+                        row_label(&p.title, p.subtitle.as_deref())
                     )?;
                 }
             }
@@ -167,9 +167,9 @@ fn home(site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result<String> {
                     let (attr, label) = skill_years(s, today);
                     write!(
                         rows,
-                        "<li><a class=\"lsb\" href=\"{}\"><span class=\"lbl\">{}</span><span class=\"yrs\"{attr}>{label}</span></a></li>",
+                        "<li><a class=\"lsb\" href=\"{}\">{}<span class=\"yrs\"{attr}>{label}</span></a></li>",
                         s.url(),
-                        esc(&s.name)
+                        row_label(&s.name, s.subtitle.as_deref())
                     )?;
                 }
             }
@@ -215,6 +215,19 @@ fn skill_years(s: &Skill, today: NaiveDate) -> (String, String) {
 
 fn plural(n: i64) -> &'static str {
     if n > 1 { "s" } else { "" }
+}
+
+/// Home row label: the title, then an optional subtitle that CSS truncates with "…" so it never
+/// pushes into the icon or years column. `title` keeps the full subtitle readable on hover.
+fn row_label(title: &str, subtitle: Option<&str>) -> String {
+    match subtitle.map(str::trim).filter(|s| !s.is_empty()) {
+        Some(sub) => format!(
+            "<span class=\"lbl\"><span class=\"lt\">{}</span><span class=\"sub\" title=\"{1}\">{1}</span></span>",
+            esc(title),
+            esc(sub)
+        ),
+        None => format!("<span class=\"lbl\"><span class=\"lt\">{}</span></span>", esc(title)),
+    }
 }
 
 fn section_icon(dir: &str) -> &'static str {
@@ -358,7 +371,7 @@ fn skill(s: &Skill, site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result
 fn not_found(chrome: &Chrome) -> String {
     let m = format!(
         "<div class=\"col col-home\"><div class=\"card a1 nf\"><b>404</b><span>Page not found.</span>\
-         <a class=\"lsb\" href=\"/\"><span class=\"lbl\">Back home</span></a></div></div>"
+         <a class=\"lsb\" href=\"/\"><span class=\"lbl\"><span class=\"lt\">Back home</span></span></a></div></div>"
     );
     shell(chrome, "Not found", "Page not found.", &m)
 }
