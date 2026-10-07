@@ -1,5 +1,6 @@
 ---
 title: "Yutori"
+subtitle: "AI research agent"
 description: "An AI-first research assistant"
 order: 2
 url: "https://yutori.com/company"

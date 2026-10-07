@@ -1,5 +1,6 @@
 ---
 title: "Better Fantasy System"
+subtitle: "D&D campaign manager"
 description: "A highly customizable table top simulator for players and GMs"
 order: 6
 draft: false

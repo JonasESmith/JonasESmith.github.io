@@ -1,5 +1,6 @@
 ---
 title: "Pakmo"
+subtitle: "Shipping management"
 description: "Shipment, order, customer tracker"
 order: 7
 draft: false
