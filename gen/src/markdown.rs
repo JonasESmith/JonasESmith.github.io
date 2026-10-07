@@ -11,7 +11,7 @@
 //! - headings: levels used in the note are compressed to consecutive ranks starting at h2 (the page
 //!   title is the h1), keeping the authored size via an `hN` class. Fixes skipped-level a11y errors.
 
-use crate::assets::{invert_ascii, Assets, Fit};
+use crate::assets::{Assets, Fit};
 use crate::page::esc;
 use crate::vault::Site;
 use crate::highlight::highlight;
@@ -118,7 +118,8 @@ fn preprocess(md: &str, site: &Site, assets: &mut Assets, ctx: &str) -> String {
             continue;
         }
         flush(&mut strip, &mut out, assets);
-        out.push_str(&wikilinks(line, site, ctx));
+        let line = callout(line);
+        out.push_str(&wikilinks(&line, site, ctx));
         out.push('\n');
     }
     flush(&mut strip, &mut out, assets);
@@ -199,16 +200,55 @@ fn code_block(lang: &str, src: &str) -> String {
     )
 }
 
-/// Dark and light variants; CSS shows the one matching the mode and scales the font so `--cols`
-/// glyphs fill the container width.
+/// ASCII art as inline SVG text: authored at 12px and scaled by the viewBox, so it fills the column
+/// at any width and isn't "illegible tiny text" to audits. Each line is pinned to the exact column
+/// width (`textLength`), so alignment never depends on the font's glyph advance.
+/// One variant for both modes: glyphs take the text colour, so the art reads as a bright figure on
+/// dark and a dark silhouette on light. (Inverting glyph density for light mode, as diobsidian did,
+/// turns blank space into a solid slab of blocks.)
 fn ascii_html(text: &str) -> String {
+    const FS: f32 = 12.0;
+    const ADV: f32 = 0.6 * FS; // monospace advance
     let text = text.trim_end_matches('\n');
-    let cols = text.lines().map(|l| l.chars().count()).max().unwrap_or(1);
+    let lines: Vec<&str> = text.lines().collect();
+    let cols = lines.iter().map(|l| l.chars().count()).max().unwrap_or(1);
+    let (w, h) = (cols as f32 * ADV, lines.len() as f32 * FS);
+    let mut t = format!("<text font-size=\"{FS}\">");
+    for (i, line) in text.lines().enumerate() {
+        let n = line.chars().count();
+        if line.trim().is_empty() {
+            continue;
+        }
+        t.push_str(&format!(
+            "<tspan x=\"0\" y=\"{:.0}\" textLength=\"{:.1}\" lengthAdjust=\"spacingAndGlyphs\">{}</tspan>",
+            (i as f32 + 0.85) * FS,
+            n as f32 * ADV,
+            esc(line)
+        ));
+    }
+    t.push_str("</text>");
     format!(
-        "<div class=\"ascii\" style=\"--cols:{cols}\" aria-hidden=\"true\"><pre class=\"asc-d\">{}</pre><pre class=\"asc-l\">{}</pre></div>",
-        esc(text),
-        esc(&invert_ascii(text))
+        "<svg class=\"ascii\" viewBox=\"0 0 {w:.0} {h:.0}\" aria-hidden=\"true\" focusable=\"false\">{t}</svg>"
     )
+}
+
+/// Obsidian callout header `> [!NOTE] Title` -> `> <b class="callout">Note</b> Title`, so the
+/// blockquote renders with a label instead of the literal marker.
+fn callout(line: &str) -> String {
+    let t = line.trim_start();
+    if let Some(rest) = t.strip_prefix('>').map(str::trim_start).and_then(|r| r.strip_prefix("[!")) {
+        if let Some(end) = rest.find(']') {
+            let kind = &rest[..end];
+            let title = rest[end + 1..].trim_start_matches(['-', '+']).trim();
+            let mut label: String = kind.to_lowercase();
+            if let Some(first) = label.get_mut(0..1) {
+                first.make_ascii_uppercase();
+            }
+            let label = if title.is_empty() { label } else { title.to_string() };
+            return format!("> <b class=\"callout\">{}</b>", esc(&label));
+        }
+    }
+    line.to_string()
 }
 
 /// Rewrites `[[target]]` / `[[target|text]]` outside inline code spans.
@@ -230,8 +270,8 @@ fn wikilinks(line: &str, site: &Site, ctx: &str) -> String {
             if let Some(end) = rest.find("]]") {
                 let inner = &rest[2..end];
                 let (target, text) = inner.split_once('|').unwrap_or((inner, inner));
-                match site.project_by_title(target) {
-                    Some(p) => out.push_str(&format!("[{}](/project/{}/)", text.trim(), p.slug)),
+                match site.link(target) {
+                    Some(url) => out.push_str(&format!("[{}]({url})", text.trim())),
                     None => {
                         eprintln!("warn [{ctx}]: unresolved wikilink [[{inner}]]");
                         out.push_str(text.trim());

@@ -1,7 +1,7 @@
 ---
 title: "Portfolio"
 description: "A looking glass into my projects, work, and love for building"
-order: 2
+order: 4
 draft: false
 icon: "dagger.png"
 start: "2023-06-01"

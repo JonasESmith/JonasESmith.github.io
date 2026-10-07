@@ -1,10 +1,9 @@
 ---
 name: "UI/UX Design"
 order: 3
-draft: false
 start: "2017-01-01"
 ---
 
-I have always enjoyed creating software that is intuitive, beautiful, and empowering for its users. My journey in software development began with Javascript, HTML, and CSS. From there, I expanded my skills to include C#, Flutter, and various other frameworks and technologies. My most recent exploration has been with Rust.
+I've always enjoyed creating software that is intuitive, beautiful, and empowering for the people using it. My journey started with JavaScript, HTML, and CSS, then grew to include C#, [[Flutter]], and a range of other frameworks, and most recently [[Rust]].
 
-Ultimately, I've found myself moving towards Flutter. It feels the most empowering and allows me to develop both MVPs and production-ready code with the greatest confidence.
+Ultimately, I've found myself moving towards Flutter. It feels the most empowering, and lets me develop both MVPs and production-ready code with the greatest confidence. [[Pencil Drawing|Drawing]] helps here too, especially when designing out an application.

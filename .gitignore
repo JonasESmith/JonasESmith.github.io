@@ -9,8 +9,9 @@
 /gen/target/
 target/
 
-# Raw Lighthouse JSON (summaries in perf/*.md are tracked)
-/perf/lighthouse/
+# Size and Lighthouse reports (local only)
+/perf/
+perf/*
 
 # Legacy local folders from the Flutter / Dioxus era (untracked)
 /rust-port/

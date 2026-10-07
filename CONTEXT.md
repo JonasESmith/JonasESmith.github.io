@@ -192,8 +192,8 @@ public/ ──(verbatim)──► page.rs       templates; inline CSS + init scr
 | `just build` | Builds `vault/` into `dist/` |
 | `just build-drafts` | Also builds projects/skills marked `draft: true` |
 | `just serve` | Serves `dist/` at `http://localhost:8000` |
-| `just report` | Size and budget report, saved to `perf/` |
-| `just lighthouse /path/` | Lighthouse run against `just serve`; the JSON lands in `perf/lighthouse/` (gitignored) |
+| `just report` | Size and budget report, saved to `perf/` (gitignored, local only) |
+| `just lighthouse /path/` | Lighthouse run against `just serve`; the JSON lands in `perf/lighthouse/` |
 | `just check` | CI gate: build, then fail if any page is over budget (`gen report --check`) |
 | `just lighthouse-all` | Lighthouse on every page. Starts its own server, warms each URL, retries interstitials. Summary goes to `perf/lighthouse-<date>-<rev>.md`. |
 
@@ -289,7 +289,7 @@ Each page ships:
 | Strip (consecutive images) | 320px tall | Same as gallery, lazy |
 | `--dither [--4\|--8\|--16]` | ≤600px wide | Floyd–Steinberg. Palette PNG at minimal bit depth. Baked navy→cream duotone. |
 | `--dither … --accent` | ≤600px wide | Grey palette tinted by the scheme primary via CSS `mix-blend-mode: multiply` |
-| `--ascii` | 120 cols | 8 glyphs after a 2nd–98th percentile contrast stretch. Dark and light variants switch by CSS. Font scales with `100cqi / cols / .6`, no JS. |
+| `--ascii` | 120 cols, ≤640px wide | 8 glyphs after a 2nd–98th percentile contrast stretch. Rendered as **inline SVG text**: authored at 12px, scaled by the viewBox, each line pinned with `textLength`, so audits don't see "illegible text". One variant for both modes, in the text colour, so it's a bright figure on dark and a silhouette on light. Inverting glyph density for light mode, the diobsidian approach, made a solid slab. |
 
 - **Transparency:** real alpha is detected (not just an RGBA container). Opaque sources get JPEG fallbacks and RGB AVIF.
 - **Orientation:** EXIF orientation is applied.
@@ -307,11 +307,13 @@ Each page ships:
 - **`projects/<Title>.md`**
   - Frontmatter: `title`, `description`, `order`, `draft`, `url`, `icon`, `start`, `end`, `platforms[]` (ios/android/web/ipad/macos), `technologies[{name,url}]`, `gallery[]` (file names).
   - Body: markdown.
-- **`skills/<Name>.md`**
-  - Frontmatter: `name`, `order`, `draft`, `start`, `end`, `sub_skills[]`.
-  - Body: markdown, not rendered in the Flutter layout.
+- **`skills/<Name>.md`** (one page each at `/skill/<Name>/`, linked from the home skill rows)
+  - Frontmatter: `name`, `order`, `draft`, `start`, `end`, `sub_skills[]`. Each sub-skill is either `- Bloc` or `- { name: Bloc, note: State management }`.
+  - The page shows a span line ("since 2018 · 8.7 y"), a Toolbox list with the sub-skill notes, then the body. Galleries, ASCII art and dithering work in the body as in projects.
+  - The file name is free, since the display name comes from frontmatter. Avoid leading dots: `.Net.md` was hidden by Obsidian, so it's now `DotNet.md`.
 - **Links and embeds:**
-  - `[[Project]]` and `[[Project|text]]` link to project pages.
+  - `[[Name]]` and `[[Name|text]]` link to a project page, or failing that a skill page (case-insensitive).
+  - Obsidian callouts (`> [!NOTE]`, `> [!TIP] Custom title`) render as a labelled blockquote.
   - `![[file]]` and `![[file|caption]]` embed images; consecutive embeds become a scrolling strip.
   - `![[art.txt]]` embeds ASCII art.
   - Assets are resolved by file name anywhere in the vault, as Obsidian does.
@@ -336,7 +338,9 @@ Each page ships:
 - The scheme persists between visits; Flutter reset it to Midnight on every load.
 - Entrance animations start immediately and finish within 600ms. Flutter waited 600ms first.
 - The broken profile link (BFS → Eqalink) is fixed.
-- Yutori and Acro-yoga from the Dioxus `work.json` are migrated as `draft: true`.
+- Yutori and Acro-yoga from the Dioxus `work.json` were migrated as `draft: true`, then published on 2026-10-06 at the owner's request.
+- Skills are clickable and have their own pages; the Flutter skill rows were not links.
+- Projects without an `icon` show their first letter in the tile (Midwestern Interactive, Yutori).
 
 ---
 
@@ -350,7 +354,7 @@ Each page ships:
 | 4 | Generator home | **New crate in this repo**: `gen/` |
 | 5 | Privacy | **`/no-data.html` unchanged**: same URL, same content (store listings point at it) |
 | 6 | Deploy | **GitHub Actions → Pages** (`deploy.yml` on push to `master`), with the Flutter build removed from the repo. No custom domain for now: `www.jonasesmith.com` is a Namecheap parking page. To use it later, point DNS at Pages and add `public/CNAME`. |
-| 7 | Extra content (Yutori, Acro-yoga) | *Open*: currently drafts. Flip `draft: false` to publish. |
+| 7 | Extra content | **Published** (2026-10-06): Yutori, Acro-yoga, and Midwestern Interactive as the current role. Project order puts the newest first: MWI, Yutori, then the Flutter-era list. |
 
 ---
 
@@ -383,7 +387,7 @@ Each page ships:
   - Preload the LCP image. *Not needed:* the first screenshot is already in the initial HTML with `fetchpriority=high`, and observed LCP is 41–322ms locally.
   - CI budget check that fails `gen report` when over budget.
   - Lighthouse on every page.
-- [ ] **P6 Deploy** (in progress). Original plan:
+- [x] **P6 Deploy** (live 2026-10-05, `master` @ `00c87ef`). Original plan:
   - Actions → Pages.
   - Remove the Flutter build artifacts and sources from `master`: `lib/`, `canvaskit/`, `assets/`, `images/`, `main.dart.js`, platform folders, `portfolio_data/`, `compress_images/`.
   - Delete the gitignored `rust-port/target` and `image_manager/target` directories locally (~4.3G).
@@ -410,6 +414,21 @@ Each page ships:
 | 2026-10-05 | gen P4 | `/project/Eqalink/` | 6.9KB | 0 | ≈2KB br | 63KB | **100 / 1.7s**; a11y, best practices and SEO 100 | |
 | 2026-10-05 | gen P4 | `/project/Portfolio/` | 6.4KB | 0 | ≈2KB br | 10KB | **100 / 1.1s**; a11y, best practices and SEO 100 | Highlighted code blocks |
 | 2026-10-05 | gen P4 | `/project/Rock-Climber-Guide/` | 6.9KB | 0 | ≈2KB br | 72KB | **100 / 1.7s**; a11y, best practices and SEO 100 | |
+| 2026-10-05 | **live** `00c87ef` | `/` | 8.4KB gz | 0 | 2.3KB gz | 20KB total | **100 / 0.8s**; all categories 100 | GitHub Pages with real gzip |
+| 2026-10-05 | **live** `00c87ef` | `/project/Eqalink/` | 8.7KB gz | 0 | 2.3KB gz | 211KB total | **100 / 1.2s**; all categories 100 | |
+
+**Real-network cold loads of the live site** (puppeteer, fresh context, cache disabled, mobile viewport, median of 5):
+
+| Network | Page | FCP | LCP | Load |
+|---|---|---|---|---|
+| Unthrottled | `/` | 112ms | 112ms | 111ms |
+| Unthrottled | `/project/Eqalink/` | 100ms | 100ms | 134ms |
+| Unthrottled | `/project/Rock-Climber-Guide/` | 116ms | 116ms | 168ms |
+| 4G (60ms RTT, 9Mbps) | `/` | 148ms | 148ms | 214ms |
+| 4G (60ms RTT, 9Mbps) | `/project/Eqalink/` | 132ms | 300ms | 281ms |
+| 4G (60ms RTT, 9Mbps) | `/project/Rock-Climber-Guide/` | 148ms | 312ms | 282ms |
+
+**The sub-400ms goal is met**, including LCP on the screenshot-heavy pages. For comparison, the Flutter site needed about 3.3MB before first paint.
 
 Lighthouse notes:
 - **The LCP number is mostly simulation.** Observed LCP locally is 32–38ms on every page. Lighthouse picks the `~` gutter text as the LCP element, because the gallery fades in from `opacity:0` and Chrome excludes it. The simulated LCP (1.5–1.7s on slow 4G) then charges the high-priority 2x screenshots that download alongside it. If the screenshots should count as the LCP, drop the `b2` fade on `.gallery`.
@@ -448,7 +467,7 @@ Lighthouse notes:
   - Committed P4 as `da0bee1`.
   - Screenshotted the live Flutter site (puppeteer, both modes), sampled surface colours and fitted `theme.rs`. Fixed the layout differences found: vertical centring, glow origin, footer chip colour, keyboard and filled-bars icons.
   - Added `gen report --check` (verified: exit 1 on an oversized page, 0 when clean), `just check`, the CI workflow, and `scripts/lighthouse.py` / `just lighthouse-all`.
-  - Lighthouse: 100 in all four categories on all 6 content pages (`perf/lighthouse-2026-10-05-*.md`).
+  - Lighthouse (mobile, simulated slow 4G, local server): 100 in all four categories on all 6 content pages. FCP 0.8–1.1s, simulated LCP 1.1–1.7s (observed 41–322ms), page weight 36–242 KiB.
   - Remaining non-scored flags:
     - `unused-css-rules` (one shared inline stylesheet).
     - `uses-responsive-images`: the Lighthouse device is DPR 1.75, so 2x is slightly larger than needed. A 1.5x variant would shave ~15KB per page; not worth it yet.
@@ -462,11 +481,40 @@ Lighthouse notes:
   - `/no-data.html` verified byte-identical to the live copy.
   - Pushed `rust-rewrite` (`367c5e8`); CI is green on GitHub.
   - Follower retune (owner request): subtler tapered/blurred glows, film grain, fade-in at the cursor. Verified with puppeteer: opacity 0 before the first move, placed at the exact cursor position, faded to 1, no errors. Lighthouse still 100 on all categories.
-  - **Switch-over order:**
+  - **2026-10-05, go-live:**
+    - The owner switched Pages to GitHub Actions and merged PR #4 (squash). The first deploy job was cancelled in GitHub's queue during an Actions incident; the build job had succeeded.
+    - At the owner's request, the Claude co-author trailers were removed from the squash commit and `master` was force-pushed: `eec18ca` → `00c87ef`, same tree. GitHub's contributors API lists only JonasESmith; the repo page's contributors widget refreshes on GitHub's cache schedule.
+    - The deploy for `00c87ef` succeeded: build 10s (cached generator), deploy 10s.
+    - Verified live:
+      - all 6 pages return 200 (about 8KB gz)
+      - slash-less URLs and `/home` redirect
+      - `/no-data.html` is byte-identical
+      - the service-worker kill switch is served
+      - the 404 page works
+    - Lighthouse on live: 100 in all categories. Real-network cold loads 100–312ms (table in §6).
+    - Follow-ups:
+      - Delete the merged `rust-rewrite` branch, which still holds the original commits with trailers.
+      - Delete local leftovers `rust-port/` and `image_manager/` (4.3G of build caches).
+      - Optionally: update `vault/projects/Portfolio.md` (it still describes the Flutter build), and connect `www.jonasesmith.com`.
+  - **Switch-over order (as planned):**
     1. Pages Source → GitHub Actions. This is a repo setting and needs the owner, since `gh` isn't installed here. The old deployment keeps serving until a new one lands.
     2. Merge `rust-rewrite` into `master` and push.
     3. `deploy.yml` publishes.
     4. Verify live: pages, `/no-data.html` bytes, real-network timing.
+
+---
+
+- **2026-10-06 (content + skill pages)**
+  - Reviewed the notes on branch `dioxus-rust-port` (`About me/Work.md`, `Life.md`, `Skills/Drawing.md`, `work.json`) and brought them in:
+    - The about text was updated to the current role and 8 years.
+    - Midwestern Interactive was added; Yutori and Acro-yoga were published.
+    - Sub-skill notes were restored.
+    - The three portrait drawings were added (originals were AVIF, converted to PNG because the pipeline doesn't decode AVIF).
+    - ASCII art is generated from the source photos (`vault/assets/ascii/`).
+    - Writing was tightened, using only facts present in the notes.
+  - Generator changes: skill pages, wikilinks to skills, Obsidian callouts, letter tiles, ASCII as SVG text.
+  - Lighthouse: 100 in all four categories on all 16 content pages.
+  - The Lighthouse runner now skips redirect stubs and names `/` as `index` (`/` and `/home/` used to overwrite each other). `/home/` gained a favicon link, which removed a console 404.
 
 ---
 

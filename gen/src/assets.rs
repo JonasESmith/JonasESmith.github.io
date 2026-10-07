@@ -428,16 +428,6 @@ fn to_ascii(img: &DynamicImage) -> String {
     out
 }
 
-/// Light-theme variant: swap each glyph for its opposite density.
-pub fn invert_ascii(text: &str) -> String {
-    text.chars()
-        .map(|c| match ASCII_CHARS.iter().position(|&a| a == c) {
-            Some(i) => ASCII_CHARS[ASCII_CHARS.len() - 1 - i],
-            None => c,
-        })
-        .collect()
-}
-
 fn scale(v: u32, num: u32, den: u32) -> u32 {
     ((v as u64 * num as u64 + den as u64 / 2) / den as u64).max(1) as u32
 }

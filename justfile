@@ -28,3 +28,24 @@ lighthouse-all: build
 lighthouse path="/":
 	mkdir -p perf/lighthouse
 	CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npx -y lighthouse@12 "http://localhost:8000{{path}}" --quiet --chrome-flags="--headless=new" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="perf/lighthouse/$(date +%F)-$(echo '{{path}}' | tr -c 'A-Za-z0-9\n' '_').json"
+
+# Build the site image and run it on the LAN (starts Docker Desktop if needed). Usage: just docker [port] [drafts]
+docker port="8080" drafts="":
+	#!/usr/bin/env bash
+	set -euo pipefail
+	if ! docker info >/dev/null 2>&1; then
+		echo "Starting Docker Desktop..."
+		open -a Docker
+		for _ in $(seq 90); do docker info >/dev/null 2>&1 && break; sleep 1; done
+		docker info >/dev/null 2>&1 || { echo "Docker did not start within 90s (check Docker Desktop for a setup or password prompt, then rerun)" >&2; exit 1; }
+	fi
+	docker build -t portfolio-site --build-arg DRAFTS={{drafts}} .
+	docker rm -f portfolio-site >/dev/null 2>&1 || true
+	docker run -d --name portfolio-site --restart unless-stopped -p {{port}}:80 portfolio-site >/dev/null
+	ip=$(ipconfig getifaddr en0 || ipconfig getifaddr en1 || echo localhost)
+	echo "Serving on http://localhost:{{port}}  (LAN: http://$ip:{{port}})"
+	echo "Stop with: just docker-stop"
+
+# Stop and remove the `just docker` container
+docker-stop:
+	docker rm -f portfolio-site
