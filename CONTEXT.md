@@ -177,8 +177,9 @@ Working context for rebuilding jonasesmith.github.io: the same look and feel as 
 ```
 vault/ (Obsidian) ──► gen build ──► dist/  (GitHub Pages)
   profile.md            vault.rs      frontmatter (serde_yaml) + body
-  projects/*.md         markdown.rs   wikilinks / ![[embeds]] → pulldown-cmark
-  skills/*.md           theme.rs      themes.toml → CSS custom props (surfaces derived)
+  work|projects/*.md    markdown.rs   wikilinks / ![[embeds]] → pulldown-cmark
+  hobbies|skills/*.md   theme.rs      themes.toml → CSS custom props (surfaces derived)
+  details/*.md (unlisted)
   assets/**             assets.rs     image pipeline: AVIF 1x/2x + JPEG/PNG fallback, masks, dither, ASCII
                                       → .cache/img (hash-keyed) → dist/a/
 public/ ──(verbatim)──► page.rs       templates; inline CSS + init script; deferred site.<hash>.js
@@ -190,7 +191,7 @@ public/ ──(verbatim)──► page.rs       templates; inline CSS + init scr
 | Command | What it does |
 |---|---|
 | `just build` | Builds `vault/` into `dist/` |
-| `just build-drafts` | Also builds projects/skills marked `draft: true` |
+| `just build-drafts` | Also builds notes marked `draft: true` |
 | `just serve` | Serves `dist/` at `http://localhost:8000` |
 | `just report` | Size and budget report, saved to `perf/` (gitignored, local only) |
 | `just lighthouse /path/` | Lighthouse run against `just serve`; the JSON lands in `perf/lighthouse/` |
@@ -304,15 +305,23 @@ Each page ships:
 - **`profile.md`**
   - Frontmatter: `name`, `handle`, `birth_date`, `avatar`, `email`, `links[]`.
   - Body: the about text.
-- **`projects/<Title>.md`**
+- **Sections** (`SECTIONS` in `vault.rs`): one folder each, in home page order, each with a layout (project or skill page) and a URL prefix.
+  - `work/` → "Work", project layout, `/project/<Title>/`.
+  - `projects/` → "Notable Projects", project layout, `/project/<Title>/`.
+  - `hobbies/` → "Hobbies", skill layout, `/skill/<Name>/`.
+  - `skills/` → "Skills", skill layout, `/skill/<Name>/`.
+  - `details/` → not on the home page, project layout, `/details/<Title>/`. Reachable only through `[[links]]`. Frontmatter is optional; the title defaults to the file name.
+  - `work`/`hobbies` reuse the `project`/`skill` URL prefixes, so moving a note between those folders keeps its URL. The build fails if two notes map to the same URL.
+  - Empty sections are left off the home page.
+- **`projects/<Title>.md`** (also `work/`, `details/`)
   - Frontmatter: `title`, `description`, `order`, `draft`, `url`, `icon`, `start`, `end`, `platforms[]` (ios/android/web/ipad/macos), `technologies[{name,url}]`, `gallery[]` (file names).
   - Body: markdown.
-- **`skills/<Name>.md`** (one page each at `/skill/<Name>/`, linked from the home skill rows)
+- **`skills/<Name>.md`** (also `hobbies/`; one page each at `/skill/<Name>/`, linked from the home rows)
   - Frontmatter: `name`, `order`, `draft`, `start`, `end`, `sub_skills[]`. Each sub-skill is either `- Bloc` or `- { name: Bloc, note: State management }`.
   - The page shows a span line ("since 2018 · 8.7 y", or "2018–2025 · 7 years, 4 months" with an `end`), a Toolbox list with the sub-skill notes, then the body. Galleries, ASCII art and dithering work in the body as in projects.
   - The file name is free, since the display name comes from frontmatter. Avoid leading dots: `.Net.md` was hidden by Obsidian, so it's now `DotNet.md`.
 - **Links and embeds:**
-  - `[[Name]]` and `[[Name|text]]` link to a project page, or failing that a skill page (case-insensitive).
+  - `[[Name]]` and `[[Name|text]]` link to a project-layout page (work, projects, details), or failing that a skill-layout page (case-insensitive).
   - Obsidian callouts (`> [!NOTE]`, `> [!TIP] Custom title`) render as a labelled blockquote.
   - `![[file]]` and `![[file|caption]]` embed images; consecutive embeds become a scrolling strip.
   - `![[art.txt]]` embeds ASCII art.

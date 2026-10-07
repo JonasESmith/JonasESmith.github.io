@@ -27,8 +27,11 @@ Push to `master` to deploy (GitHub Actions → Pages).
 
 ## Writing content
 
-- `vault/profile.md`, `vault/projects/*.md`, `vault/skills/*.md` — YAML frontmatter + markdown.
-- Link projects or skills with `[[Name]]` or `[[Name|text]]`. Every skill gets its own page.
+- `vault/profile.md` plus one folder per section — YAML frontmatter + markdown. Home page order:
+  `work/` and `projects/` (project pages), `hobbies/` and `skills/` (skill pages).
+- `vault/details/*.md` — unlisted project-style pages at `/details/<Name>/`, reachable only via
+  links. Frontmatter is optional (the title defaults to the file name).
+- Link any page with `[[Name]]` or `[[Name|text]]`. Sections are defined in `SECTIONS` (`gen/src/vault.rs`).
 - Skill sub-skills: `- { name: Bloc, note: State management }` (or just `- Bloc`).
 - Obsidian callouts work: `> [!NOTE]`.
 - Images: `![[file.png]]` or `![caption](path/file.png)`; consecutive image lines form a strip.

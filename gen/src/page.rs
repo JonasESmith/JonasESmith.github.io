@@ -4,7 +4,7 @@
 use crate::assets::{Assets, Fit};
 use crate::markdown;
 use crate::theme::{swatch_style, Themes};
-use crate::vault::{Project, Site, Skill};
+use crate::vault::{Layout, Project, Site, Skill, SECTIONS};
 use chrono::Datelike;
 use anyhow::{Context, Result};
 use chrono::{NaiveDate, Utc};
@@ -28,11 +28,11 @@ pub fn render_site(site: &Site, themes: &Themes, assets: &mut Assets) -> Result<
     let mut pages = vec![("index.html".to_string(), home(site, assets, &chrome)?)];
     for p in &site.projects {
         let html = project(p, site, assets, &chrome).with_context(|| format!("project {}", p.title))?;
-        pages.push((format!("project/{}/index.html", p.slug), html));
+        pages.push((format!("{}index.html", &p.url()[1..]), html));
     }
     for s in &site.skills {
         let html = skill(s, site, assets, &chrome).with_context(|| format!("skill {}", s.name))?;
-        pages.push((format!("skill/{}/index.html", s.slug), html));
+        pages.push((format!("{}index.html", &s.url()[1..]), html));
     }
     pages.push(("404.html".to_string(), not_found(&chrome)));
     Ok(pages)
@@ -142,35 +142,53 @@ fn home(site: &Site, assets: &mut Assets, chrome: &Chrome) -> Result<String> {
         icon(CHEVRON_DOWN)
     )?;
 
-    write!(m, "<section class=\"a2\">{}<ul class=\"links\">", section_head("Notable Projects", KEYBOARD_CHEVRON))?;
-    for p in &site.projects {
-        // No icon: the tile shows the title's first letter instead.
-        let (ico, letter) = match &p.icon {
-            Some(name) => (format!(" style=\"--i:url({})\"", assets.mask(name, 16)?), String::new()),
-            None => (" data-letter".to_string(), esc(&p.title.chars().next().unwrap_or('?').to_string())),
-        };
+    let mut shown = 0;
+    for (i, sec) in SECTIONS.iter().enumerate() {
+        let Some(heading) = sec.heading else { continue };
+        let mut rows = String::new();
+        match sec.layout {
+            Layout::Project => {
+                for p in site.projects.iter().filter(|p| p.section == i) {
+                    // No icon: the tile shows the title's first letter instead.
+                    let (ico, letter) = match &p.icon {
+                        Some(name) => (format!(" style=\"--i:url({})\"", assets.mask(name, 16)?), String::new()),
+                        None => (" data-letter".to_string(), esc(&p.title.chars().next().unwrap_or('?').to_string())),
+                    };
+                    write!(
+                        rows,
+                        "<li><a class=\"lsb\" href=\"{}\"><span class=\"lbl\">{}</span><span class=\"ico\"{ico}>{letter}</span></a></li>",
+                        p.url(),
+                        esc(&p.title)
+                    )?;
+                }
+            }
+            Layout::Skill => {
+                for s in site.skills.iter().filter(|s| s.section == i) {
+                    let (attr, label) = skill_years(s, today);
+                    write!(
+                        rows,
+                        "<li><a class=\"lsb\" href=\"{}\"><span class=\"lbl\">{}</span><span class=\"yrs\"{attr}>{label}</span></a></li>",
+                        s.url(),
+                        esc(&s.name)
+                    )?;
+                }
+            }
+        }
+        if rows.is_empty() {
+            continue;
+        }
+        // a2 then a3: the first list rises in just after the card, the rest together.
+        let anim = if shown == 0 { "a2" } else { "a3" };
+        shown += 1;
         write!(
             m,
-            "<li><a class=\"lsb\" href=\"/project/{}/\"><span class=\"lbl\">{}</span><span class=\"ico\"{ico}>{letter}</span></a></li>",
-            p.slug,
-            esc(&p.title)
+            "<section class=\"{anim}\">{}<ul class=\"links\">{rows}</ul></section>",
+            section_head(heading, section_icon(sec.dir))
         )?;
     }
-    m.push_str("</ul></section>");
+    m.push_str("</div>");
 
-    write!(m, "<section class=\"a3\">{}<ul class=\"links\">", section_head("Skills", CHART_BAR))?;
-    for s in &site.skills {
-        let (attr, label) = skill_years(s, today);
-        write!(
-            m,
-            "<li><a class=\"lsb\" href=\"/skill/{}/\"><span class=\"lbl\">{}</span><span class=\"yrs\"{attr}>{label}</span></a></li>",
-            s.slug,
-            esc(&s.name)
-        )?;
-    }
-    m.push_str("</ul></section></div>");
-
-    Ok(shell(chrome, &pr.name, &format!("{} — projects and skills.", pr.name), &m))
+    Ok(shell(chrome, &pr.name, &format!("{} — work, projects, hobbies and skills.", pr.name), &m))
 }
 
 /// Mirrors the Flutter site: ongoing skills show fractional years ("8.7 y", refreshed client-side),
@@ -197,6 +215,15 @@ fn skill_years(s: &Skill, today: NaiveDate) -> (String, String) {
 
 fn plural(n: i64) -> &'static str {
     if n > 1 { "s" } else { "" }
+}
+
+fn section_icon(dir: &str) -> &'static str {
+    match dir {
+        "work" => BRIEFCASE,
+        "hobbies" => PALETTE,
+        "skills" => CHART_BAR,
+        _ => KEYBOARD_CHEVRON,
+    }
 }
 
 fn section_head(label: &str, svg: &str) -> String {
@@ -389,6 +416,8 @@ const CHEVRON_UP_SQUARE: &str = "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\
 // CupertinoIcons.keyboard_chevron_compact_down: keyboard over a small chevron
 const KEYBOARD_CHEVRON: &str = "<rect x=\"2\" y=\"3\" width=\"20\" height=\"12\" rx=\"2\"/><path d=\"M6 7h.01M10 7h.01M14 7h.01M18 7h.01M7 11h10M9 19l3 2 3-2\"/>";
 // CupertinoIcons.chart_bar_alt_fill: filled bars
+const BRIEFCASE: &str = "<rect x=\"2\" y=\"7\" width=\"20\" height=\"14\" rx=\"2\"/><path d=\"M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16\"/>";
+const PALETTE: &str = "<circle cx=\"13.5\" cy=\"6.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"17.5\" cy=\"10.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"8.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\"/><circle cx=\"6.5\" cy=\"12.5\" r=\".5\" fill=\"currentColor\"/><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z\"/>";
 const CHART_BAR: &str = "<path d=\"M5 20V12M10 20V5M15 20V9M20 20v-5\" stroke-width=\"3.5\" stroke-linecap=\"butt\"/>";
 const LINK: &str = "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/>";
 const MOON: &str = "<path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/>";
