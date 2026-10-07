@@ -144,7 +144,7 @@ a.pill-title{color:var(--p-text)}
 .code .c{color:#696969}.code .k{color:#7928a1}.code .s{color:#008000}.code .n{color:#aa5d00}.code .t,.code .f{color:#007faa}.code .a{color:#d91e18}
 [data-mode=dark] .code .c{color:#d4d0ab}[data-mode=dark] .code .k{color:#dcc6e0}[data-mode=dark] .code .s{color:#abe338}
 [data-mode=dark] .code .n{color:#f5ab35}[data-mode=dark] .code .t,[data-mode=dark] .code .f{color:#00e0e0}[data-mode=dark] .code .a{color:#ffa07a}
-.md table{display:block;max-width:100%;overflow-x:auto;border-collapse:collapse;margin:8px 0}
+.md table{display:block;overflow-wrap:normal;max-width:100%;overflow-x:auto;border-collapse:collapse;margin:8px 0}
 .md th,.md td{padding:4px 8px;border:1px solid var(--div);text-align:left}
 .md img{max-width:100%;height:auto;border-radius:8px}
 .md figure{margin:8px 0}
