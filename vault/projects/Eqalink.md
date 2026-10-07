@@ -1,6 +1,7 @@
 ---
 title: "Eqalink"
 description: "Security First Social Media Platform"
+subtitle: "Social media platform"
 order: 3
 draft: false
 url: "https://www.eqalink.com"

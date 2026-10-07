@@ -1,6 +1,7 @@
 ---
 title: "HaiiJo"
 description: "A climbing app built for analytic and obsessed climbers"
+subtitle: "Rock climbing app"
 order: 5
 draft: false
 icon: "rcg.png"
